@@ -1,0 +1,135 @@
+<div class="container-fluid d-none d-lg-block">
+    <div class="row align-items-center bg-dark px-lg-5">
+        <div class="col-lg-9">
+            <nav class="navbar navbar-expand-sm bg-dark p-0">
+                <ul class="navbar-nav ml-n2">
+                    <li class="nav-item border-right border-secondary">
+                        <a class="nav-link text-body small" href="{% url 'user:konten_list' %}">{% now "l, j F, Y" %}</a>
+                    </li>
+                    <li class="nav-item border-right border-secondary">
+                        {% if request.user.is_superuser %}
+                            <a class="nav-link text-body small" href="/admin/manage/" target="_self">Manage</a>
+                        {% else %}
+                            <a class="nav-link text-body small" href="/manage/" target="_self">Manage</a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item border-right border-secondary">
+                        <a class="nav-link text-body small" href="{% url 'user:contact' %}">Contact</a>
+                    </li>
+                    <li class="nav-item">    
+                        {% if user.is_authenticated %}
+                        <form action="{% url 'user:user_logout' %}" method="post">
+                            {% csrf_token %}
+                            <button class="nav-link text-body small">Logout</button>
+                        </form>
+                        {% else %}
+                        <a class="nav-link text-body small" href="{% url 'user:user_login' %}">Login</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-lg-3 text-right d-none d-md-block">
+            <nav class="navbar navbar-expand-sm bg-dark p-0">
+                <ul class="navbar-nav ml-auto mr-n2">
+                    <li class="nav-item">
+                        {% if konfigurasi_home.x %}
+                        <a class="nav-link text-body" href="{{konfigurasi_home.x}}"><small class="fab fa-twitter"></small></a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if konfigurasi_home.facebook %}
+                        <a class="nav-link text-body" href="{{konfigurasi_home.facebook}}"><small class="fab fa-facebook-f"></small></a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if konfigurasi_home.linkedin %}
+                        <a class="nav-link text-body" href="{{konfigurasi_home.linkedin}}"><small class="fab fa-linkedin-in"></small></a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if konfigurasi_home.instagram %}
+                        <a class="nav-link text-body" href="{{konfigurasi_home.instagram}}"><small class="fab fa-instagram"></small></a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        {% if konfigurasi_home.tiktok %}
+                        <a class="nav-link text-body" href="{{konfigurasi_home.tiktok}}"><small class="fab fa-tiktok"></small></a>
+                        {% endif %}
+                    </li>
+                    
+                    <li class="nav-item">
+                        {% if request.user.is_authenticated %}
+                        <a class="nav-link text-body" href="{% url 'user:user_profil' request.user.pk %}">
+                            {% if request.user.foto %}
+                                <img src="{{ request.user.foto.url }}" alt="Profile Image" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+                            {% else %}
+                                <img src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="Default Profile Image" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                    </li>
+                </ul>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="row align-items-center bg-white py-3 px-lg-5">
+        <div class="col-lg-4">
+            <a href="{% url 'user:konten_list' %}" class="navbar-brand p-0 d-none d-lg-block">
+                <h1 class="m-0 display-4 text-uppercase text-primary">{{konfigurasi_home.judul_website}}<span class="text-secondary font-weight-normal">CMS</span></h1>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Navbar Start -->
+<div class="container-fluid p-0 z-50">
+    <nav class="bg-gray-900 text-white py-2 px-5 z-50">
+        <div class="flex justify-between items-center">
+            <a href="index.html" class="block lg:hidden text-primary font-bold text-3xl">
+                Biz<span class="text-white">News</span>
+            </a>
+            <button class="block lg:hidden focus:outline-none" id="navbar-toggle">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+            <!-- Navbar content -->
+            <div class="hidden lg:flex w-full justify-between items-center" id="navbar-collapse z-50">
+                <div class="flex space-x-4 z-50">
+                    <a href="{% url 'user:konten_list' %}" class="text-white font-medium hover:text-gray-400">Home</a>
+                    <a href="{% url 'user:kategori_list' %}" class="text-white font-medium hover:text-gray-400">Category</a>
+                    <a href="{% url 'user:contact' %}" class="text-white font-medium hover:text-gray-400">Contact</a>
+                </div>
+                <!-- Search bar -->
+                <div class="hidden lg:flex items-center w-full max-w-xs">
+                    <form method="get" 
+                    action="{% if request.path == '/' %}
+                                {% url 'user:konten_list' %}
+                            {% elif request.path == '/kategori/' %}
+                                {% url 'user:kategori_list' %}
+                    {% endif %}"
+                    class="flex w-full">
+                        <input type="text" id="search-bar" name="q" class="form-input w-full bg-gray-800 text-white border-none focus:ring-0 rounded-l-lg" placeholder="Keyword">
+                        <button type="submit" class="bg-primary text-white px-3 rounded-r-lg focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l-3-3 3-3m13 0h-7m0 0V4m0 9l3 3-3 3"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>
+<!-- Navbar End -->
+
+    <script>
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'f') {
+                event.preventDefault();
+                document.getElementById('search-bar').focus();
+            }
+        });
+    </script>    

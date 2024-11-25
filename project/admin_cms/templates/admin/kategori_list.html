@@ -1,0 +1,19 @@
+<h1>Daftar Kategori</h1>
+<a href="{% url 'admins:kategori_create' %}">Tambah Kategori</a>
+
+<table>
+    <tr>
+        <th>Kategori</th>
+        <th>Aksi</th>
+    </tr>
+    {% for kategori in kategoris %}
+    <tr>
+        <td>{{ kategori.kategori }}</td>
+        <td>
+            <a href="{% url 'admins:kategori_update' kategori.pk %}">Edit</a>
+            <a href="{% url 'admins:kategori_delete' kategori.pk %}">Hapus</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+    

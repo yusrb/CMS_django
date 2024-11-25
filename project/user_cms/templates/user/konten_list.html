@@ -1,0 +1,329 @@
+{% load static %}
+{% include 'base.html' %}
+
+{% include 'snippets/nav.html' %}
+
+{% block content %}
+    <!-- Main News Slider Start -->
+    <div class="container-fluid z-0">
+        <div class="row">
+            <div class="col-lg-7 px-0">
+                <div class="owl-carousel main-carousel position-relative">
+                    {% for konten in kontens_random_carousel|slice:":4" %}
+                    <div class="position-relative overflow-hidden" style="height: 500px;">
+                        <img class="img-fluid h-100" src="{{ konten.foto.url }}" style="object-fit: cover;">
+                        <div class="overlay">
+                            <div class="mb-2">
+                                <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+                                    href="{% url 'user:kategori_detail' konten.kategori.pk %}" target="_self">{{ konten.kategori }}</a>
+                                <a class="text-white" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ konten.tanggal|date:'Y-m-d' }}">{{ konten.tanggal|date:"M d, Y" }}</a>
+                            </div>
+                            <a class="h2 m-0 text-white text-uppercase font-weight-bold" href="{% url 'user:konten_detail' konten.slug %}" target="_self">{{ konten.judul }}</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <div class="col-lg-5 px-0">
+                <div class="row mx-0">
+                    {% for konten in kontens_random|slice:":4" %}
+                    <div class="col-md-6 px-0">
+                        <div class="position-relative overflow-hidden" style="height: 250px;">
+                            <img class="img-fluid w-100 h-100" src="{{konten.foto.url}}" style="object-fit: cover;">
+                            <div class="overlay">
+                                <div class="mb-2">
+                                    <a class="bg-yellow-300 text-black uppercase text-[10px] font-medium px-1.5 py-1 mr-1"
+                                        href="{% url 'user:kategori_detail' konten.kategori.pk %}">
+                                        {{ konten.kategori }}
+                                        </a>
+                                        <a class="text-body" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ konten.tanggal|date:'Y-m-d' }}">
+                                            <small>{{ konten.tanggal|date:"M d, Y" }}</small>
+                                        </a>
+                                </div>
+                                <a class="h6 m-0 text-white text-uppercase font-weight-semi-bold" href="{% url 'user:konten_detail' konten.slug %}" target="_self">{{ konten.judul }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main News Slider End -->
+
+    <!-- Breaking News Start -->
+    <div class="container-fluid bg-dark py-3 mb-3 z-0">
+        <div class="container">
+            <div class="row align-items-center bg-dark">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between">
+                        <div class="bg-primary text-dark text-center font-weight-medium py-2" style="width: 170px;">
+                            Breaking News
+                        </div>
+                        <div class="owl-carousel tranding-carousel position-relative d-inline-flex align-items-center ml-3"
+                            style="width: calc(100% - 170px); padding-right: 90px;">
+                            {% for post in post_terbarus %}
+                            <div class="text-truncate">
+                                <a class="text-white text-uppercase font-weight-semi-bold" href="{% url 'user:konten_detail' post.slug %}" target="_self"">
+                                    {{ post.judul }}
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breaking News End -->
+
+    <!-- Top News Slider Start -->
+    <div class="container-fluid pt-5 mb-3">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up" data-aos-duration="1000">
+                <h4 class="m-0 text-uppercase font-weight-bold">Top News</h4>
+            </div>
+            <div class="owl-carousel news-carousel carousel-item-4 position-relative">
+                {% for post in top_posts %}
+                    {% if forloop.counter0 < 1 %}
+                        <div class="position-relative overflow-hidden" style="height: 300px;" data-aos="fade-right" data-aos-duration="2000">
+                    {% else %}
+                        <div class="position-relative overflow-hidden" style="height: 300px;" data-aos="fade-left" data-aos-duration="2000">
+                    {% endif %}
+                            <img class="img-fluid h-100" src="{{ post.foto.url }}" style="object-fit: cover;">
+                            <div class="overlay">
+                                <div class="mb-2">
+                                    <a class="p-2 text-[8.9px] text-black font-semibold hover:text-black hover:no-underline hover:opacity-90 bg-yellow-300" href="{% url 'user:kategori_detail' post.kategori.pk %}">
+                                        {{ post.kategori }}
+                                    </a>
+                                    <a class="text-white" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ post.tanggal|date:'Y-m-d' }}">
+                                    <small class="text-[8.5px] leading-relaxed ml-1">{{ post.tanggal|date:"M d, Y" }}</small>
+                                </a>
+                                </div>
+                                <a target="_self" class="h6 m-0 text-white text-uppercase font-weight-semi-bold" href="{% url 'user:konten_detail' post.slug %}">
+                                    {{ post.judul }}
+                                </a>
+                            </div>
+                        </div>
+                {% endfor %}
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- News With Sidebar Start -->
+    <div class="container-fluid">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-12" data-aos="fade-up" data-aos-duration="1000">
+                            <div class="section-title">
+                                <h4 class="m-0 text-uppercase font-weight-bold">Latest News</h4>
+                                <a class="text-secondary font-weight-medium text-decoration-none" href="{% url 'user:konten_latest' %}">View All</a>
+                            </div>
+                        </div>
+                        {% for post in post_terbarus|slice:":4" %}
+                        <div class="col-lg-6" style="height: 480px;" data-aos="fade-up" data-aos-duration="1500">
+                            <div class="position-relative mb-3">
+                                <img class="img-fluid w-100" src="{{ post.foto.url }}" style="object-fit: cover; height: 280px;">
+                                <div class="bg-white border border-top-0 p-4">
+                                    <div class="mb-2">
+                                        <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'user:kategori_detail' post.kategori.pk %}">{{ post.kategori }}</a>
+                                        <a class="text-body" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ post.tanggal|date:'Y-m-d' }}">
+                                            <small>{{ post.tanggal|date:"M d, Y" }}</small>
+                                        </a>
+                                    </div>
+                                    <a class="mb-3 text-[20px] hover:text-black hover:underline w-[60%] text-black font-extrabold" href="{% url 'user:konten_detail' post.slug %}" target="_self">{{ post.judul }}</a>
+                                    <p class="m-0">{{ post.deskripsi }}</p>
+                                </div>
+                                <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
+                                    {% if post.user.pk is not request.user.pk %}
+                                    <a href="{% url 'user:user_detail' post.user.pk %}">
+                                        <div class="d-flex align-items-center">
+                                            {% if post.user.foto and post.user.foto.url %}
+                                                <img class="rounded-circle mr-2" src="{{ post.user.foto.url }}" width="25" height="25" alt="">
+                                            {% else %}
+                                                <img class="rounded-circle mr-2" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" width="25" height="25" alt="">
+                                            {% endif %}
+                                            <small>{{ post.user }}</small>
+                                        </div>
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'user:user_profil' request.user.pk %}">
+                                        <div class="d-flex align-items-center">
+                                            {% if post.user.foto and post.user.foto.url %}
+                                                <img class="rounded-circle mr-2" src="{{ post.user.foto.url }}" width="25" height="25" alt="">
+                                            {% else %}
+                                                <img class="rounded-circle mr-2" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" width="25" height="25" alt="">
+                                            {% endif %}
+                                            <small>{{ post.user }}</small>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+                                    <div class="d-flex align-items-center">
+                                        <small class="ml-3"><i class="far fa-eye mr-2"></i>{{ post.dilihat }}</small>
+                                        <small class="ml-3"><i class="far fa-comment mr-2"></i>{{ post.total_komentar }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                        <div class="col-lg-12 mb-3" id="konten-list">
+                            {% if konfigurasi_home.iklan %}
+                            <a href="{{konfigurasi_home.url_iklan}}" class="cursor-pointer"><img class="w-full h-[150px]" style="background-position: cover;" data-aos="fade-up" data-aos-duration="2000" src="{{konfigurasi_home.iklan.url}}" alt=""></a>
+                            {% else %}
+                             <a href="https://wa.link/ y2425f" class="cursor-pointer" target="_blank"><img class="w-full h-[150px]" style="background-position: cover;" data-aos="fade-up" data-aos-duration="2000" src="https://1.bp.blogspot.com/-cuxldiexuRc/WBrRyBUEWNI/AAAAAAAABr4/UwKfgNlkjb4V8acyV1UMqg34fHUH8PidQCLcB/s1600/pasang-iklan-banner.jpg" alt=""></a>
+                            {% endif %}
+                        </div>
+                        {% for konten in kontens_random %}
+                        <div class="col-lg-6" data-aos="fade-up" data-aos-duration="2000">
+                            <div class="position-relative mb-3">
+                                <img class="img-fluid w-100" src="{{ konten.foto.url }}" style="object-fit: cover; height: 300px;">
+                                <div class="bg-white border border-top-0 p-4">
+                                    <div class="mb-2">
+                                        <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'user:kategori_detail' konten.kategori.pk %}">{{ konten.kategori }}</a>
+                                        <a class="text-body" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ konten.tanggal|date:'Y-m-d' }}">
+                                        <small>{{ konten.tanggal|date:"M d, Y" }}</small>
+                                    </a>
+                                    </div>
+                                    <a href="{% url 'user:konten_detail' konten.slug %}" class="mb-0 text-[20px] hover:text-black hover:underline w-[60%] text-black font-extrabold" target="_self">{{ konten.judul }}</a>
+                                </div>
+                                <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
+                                    {% if konten.user.pk is not request.user.pk %}
+                                    <a href="{% url 'user:user_detail' konten.user.pk %}">
+                                        <div class="d-flex align-items-center">
+                                            {% if konten.user.foto and konten.user.foto.url %}
+                                                <img class="rounded-circle mr-2" src="{{ konten.user.foto.url }}" width="25" height="25" alt="">
+                                            {% else %}
+                                                <img class="rounded-circle mr-2" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" width="25" height="25" alt="">
+                                            {% endif %}
+                                            <small>{{ konten.user }}</small>
+                                        </div>
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'user:user_profil' request.user.pk %}">
+                                        <div class="d-flex align-items-center">
+                                            {% if konten.user.foto and konten.user.foto.url %}
+                                                <img class="rounded-circle mr-2" src="{{ konten.user.foto.url }}" width="25" height="25" alt="">
+                                            {% else %}
+                                                <img class="rounded-circle mr-2" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" width="25" height="25" alt="">
+                                            {% endif %}
+                                            <small>{{ konten.user }}</small>
+                                        </div>
+                                    </a>
+                                    {% endif %}
+                                    <div class="d-flex align-items-center">
+                                        <small class="ml-3"><i class="far fa-eye mr-2"></i>{{ konten.dilihat }}</small>
+                                        <small class="ml-3"><i class="far fa-comment mr-2"></i>{{ konten.total_komentar }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>         
+                        
+                </div>
+
+                {% include 'snippets/sidebar.html' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="col-12" id="pagination-container" data-aos="zoom-in" data-aos-duration="3000">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <!-- First and Previous page -->
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_input %}&q={{ search_input }}{% endif %}#konten-list" aria-label="Previous"
+                        onclick="scrollToPagination(event)">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Page Numbers -->
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_input %}&q={{ search_input }}{% endif %}#konten-list" onclick="scrollToPagination(event)">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                <!-- Next page -->
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_input %}&q={{ search_input }}{% endif %}#konten-list" aria-label="Next"
+                        onclick="scrollToPagination(event)">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+
+    <!-- News With Sidebar End -->
+
+    {% include 'snippets/footer.html' %}
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary btn-square back-to-top"><i class="fa fa-arrow-up"></i></a>
+
+    <script>
+        document.getElementById('navbar-toggle').addEventListener('click', function () {
+            document.getElementById('navbar-collapse').classList.toggle('hidden');
+        });
+
+        function scrollToElementById(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+            }
+
+            window.onload = function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('scroll_to') && urlParams.get('scroll_to') === 'saran_form') {
+                    const element = document.getElementById('saran_form');
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            };
+
+        document.addEventListener("DOMContentLoaded", function() {
+        if (window.location.hash) {
+            var targetId = window.location.hash;
+
+            window.setTimeout(function() {
+                var targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 50);
+        }
+    });
+    </script>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <!-- Template Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% endblock content %}

@@ -1,0 +1,65 @@
+from django.db import models
+from admin_cms.models import User
+from django.utils.text import slugify
+from colorfield.fields import ColorField
+from ckeditor.fields import RichTextField
+
+class Konten(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    judul = models.CharField(max_length=60)
+    kategori = models.ForeignKey('admin_cms.Kategori', on_delete=models.CASCADE)
+    slug = models.SlugField(unique=True, max_length=255)
+    isi_konten = RichTextField()
+    tanggal = models.DateTimeField(auto_now_add=True)
+    dilihat = models.PositiveIntegerField(default=0)
+    username = models.CharField(max_length=60 , null=True , blank=True)
+    foto = models.ImageField(upload_to="konten_foto/")
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.judul)
+        super(Konten, self).save(*args, **kwargs)
+
+    class Meta:
+        permissions = [
+            ("can_add_konten", "Can add konten"),
+            ("can_change_konten", "Can change konten"),
+            ("can_delete_konten", "Can delete konten"),
+            ("can_view_konten", "Can view konten"),
+        ]
+
+    def __str__(self):
+        return self.judul
+
+class Saran(models.Model):
+    isi_saran = models.TextField()
+    tanggal = models.DateTimeField(auto_now_add = True)
+    nama = models.CharField(max_length=60)
+    email = models.CharField(max_length=60)
+
+    def __str__(self):
+        return self.isi_saran
+
+class Komen(models.Model):
+    konten = models.ForeignKey(Konten, related_name='komentar', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    nama = models.CharField(max_length=50)
+    email = models.EmailField()
+    pesan = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username
+
+class Reply(models.Model):
+    komen = models.ForeignKey(Komen, related_name='replies', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    nama = models.CharField(max_length=50)
+    email = models.EmailField()
+    pesan = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    reply_to = models.ForeignKey('self', null=True, blank=True, related_name='nested_replies', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Reply by {self.user.username} on {self.komen}"

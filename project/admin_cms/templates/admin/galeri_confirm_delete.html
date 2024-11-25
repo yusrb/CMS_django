@@ -1,0 +1,20 @@
+<h1>Yakin ingin menghapus
+    {{galeri.judul}}</h1>
+{% if galeri.foto %}
+    <img src="{{ galeri.foto.url }}" alt="{{ galeri.judul }}">
+{% else %}
+    <p>Tidak ada foto</p>
+{% endif %}
+
+<table>
+    <form action="{% url 'admins:galeri_delete' galeri.pk %}" method="post">
+        {% csrf_token %}
+        {{form.as_table}}
+        <input type="submit" value="Ya">
+        <a href="{% url 'admins:galeri_list' %}">
+            <input type="button" value="Tidak">
+        </a>
+    </form>
+</table>
+
+<a href="{% url 'admins:galeri_list' %}">Kembali</a>

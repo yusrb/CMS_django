@@ -1,0 +1,27 @@
+<h1>Galeri List</h1>
+
+<a href="{% url 'admins:galeri_create' %}" class="add-galeri-link">Tambah Galeri</a>
+
+<table>
+    <tr>
+        <th>Judul</th>
+        <th>Foto</th>
+        <th>Aksi</th>
+    </tr>
+    {% for galeri in galeris %}
+    <tr>
+        <td>{{ galeri.judul }}</td>
+        <td>
+            {% if galeri.foto %}
+                <img src="{{ galeri.foto.url }}" alt="{{ galeri.judul }}">
+            {% else %}
+                <p>Tidak ada foto</p>
+            {% endif %}
+        </td>
+        <td class="action-links">
+            <a href="{% url 'admins:galeri_update' galeri.pk %}">Edit</a>
+            <a href="{% url 'admins:galeri_delete' galeri.pk %}">Hapus</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>

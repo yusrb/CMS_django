@@ -1,0 +1,13 @@
+<h1>Galeri</h1>
+<ul>
+    {% for galeri in galeris %}
+    <li>
+        <h3>{{ galeri.judul }}</h3>
+        {% if galeri.foto %}
+            <img src="{{ galeri.foto.url }}" alt="{{ galeri.judul }}" width="150">
+        {% else %}
+            <p>Tidak ada gambar</p>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>

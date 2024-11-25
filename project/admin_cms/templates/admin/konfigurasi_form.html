@@ -1,0 +1,12 @@
+<h1>Update Konfigurasi</h1>
+
+<table>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{form.as_table}}
+        {{form.media}}
+    </form>
+    <button type="submit">Update</button>
+</table>
+
+<a href="{% url 'admins:konten_list' %}">Kembali</a>

@@ -1,0 +1,169 @@
+{% include 'base.html' %}
+
+{% block content %}
+
+{% include 'snippets/nav.html' %}
+    <!-- Contact Start -->
+    <div class="container-fluid mt-5 pt-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Contact Us For Any Queries</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-4 mb-3">
+                        <div class="mb-4">
+                            <h6 class="text-uppercase font-weight-bold">Contact Info</h6>
+                            <p class="mb-4">Terima kasih telah mengunjungi situs kami! Jika Anda memiliki pertanyaan, saran, atau membutuhkan bantuan lebih lanjut, jangan ragu untuk menghubungi kami melalui formulir di bawah ini. Tim kami siap membantu Anda.</p>
+                            {% for konfig in konfigurasis %}
+							<div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-map-marker-alt text-primary mr-2"></i>
+                                    <h6 class="font-weight-bold mb-0">Our Office</h6>
+                                </div>
+                                <p class="m-0">{{konfig.alamat}}</p>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-envelope-open text-primary mr-2"></i>
+                                    <h6 class="font-weight-bold mb-0">Email Us</h6>
+                                </div>
+                                <p class="m-0">{{konfig.email}}</p>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fa fa-phone-alt text-primary mr-2"></i>
+                                    <h6 class="font-weight-bold mb-0">Call Us</h6>
+                                </div>
+                                <p class="m-0">{{request.user.telepon}}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <h6 class="text-uppercase font-weight-bold mb-3" id="saran_form">Contact Us</h6>
+                        <form action="{% url 'user:saran_create' %}?asal=contact" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <textarea class="form-control form-control-lg" name="isi_saran" placeholder="Isi Saran" rows="4" required></textarea>
+                            </div>
+                            <div class="input-group mb-2" style="width: 100%;">
+                                <input type="text" class="form-control form-control-lg mb-3" name="nama" placeholder="Nama" value="{{request.user.nama}}" required>
+                                <div class="input-group-append">
+                                    <input type="email" class="form-control form-control-lg" name="email" placeholder="Email" value="{{request.user.email}}"  required>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary font-weight-bold px-3" type="submit">Kirim Saran</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        {% if messages %}
+                        {% for message in messages %}
+                            <small class="text-success ml-56">{{ message }}</small>
+                        {% endfor %}
+                    {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <!-- Social Follow Start -->
+                    {% if konfigurasi_home %}
+                        <div class="mb-3">
+                            <div class="section-title mb-0">
+                                <h4 class="m-0 text-uppercase font-weight-bold">Follow Us</h4>
+                            </div>
+                            <div class="bg-white border border-top-0 p-3">
+                                {% if konfigurasi_home.x %}
+                                <a href="{{ konfigurasi_home.x }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #1DA1F2;">
+                                    <i class="fab fa-twitter text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                    <span class="font-weight-medium">Twitter</span>
+                                </a>
+                                {% endif %}
+                                {% if konfigurasi_home.facebook %}
+                                <a href="{{ konfigurasi_home.facebook }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #39569E;">
+                                    <i class="fab fa-facebook-f text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                    <span class="font-weight-medium">Facebook</span>
+                                </a>
+                                {% endif %}
+                                {% if konfigurasi_home.linkedin %}
+                                <a href="{{ konfigurasi_home.linkedin }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #0077B5;">
+                                    <i class="fab fa-linkedin-in text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                    <span class="font-weight-medium">Linkedin</span>
+                                </a>
+                                {% endif %}
+                                {% if konfigurasi_home.instagram %}
+                                <a href="{{ konfigurasi_home.instagram }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #52AAF4;">
+                                    <i class="fab fa-instagram text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                    <span class="font-weight-medium">Instagram</span>
+                                </a>
+                                {% endif %}
+                                {% if konfigurasi_home.tiktok %}
+                                <a href="{{ konfigurasi_home.tiktok }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: black;">
+                                    <i class="fab fa-tiktok text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                    <span class="font-weight-medium">Tiktok</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="mb-3">
+                            <div class="section-title mb-0">
+                                <h4 class="m-0 text-uppercase font-weight-bold">Follow Us</h4>
+                            </div>
+                            <div class="bg-white border border-top-0 p-3 text-center">
+                                <p class="text-md">Belum ada Social Media.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Social Follow End -->
+
+                    <!-- Newsletter Start -->
+                    <div class="mb-3">
+                        <div class="section-title mb-0">
+                            <h4 class="m-0 text-uppercase font-weight-bold">Newsletter</h4>
+                        </div>
+                        <div class="bg-white text-center border border-top-0 p-3">
+                            <p>Berlangganan untuk mendapatkan info menarik langsung ke inbox.</p>
+                            <div class="input-group mb-2" style="width: 100%;">
+                                <input type="text" class="form-control form-control-lg" placeholder="Your Email">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary font-weight-bold px-3">Sign Up</button>
+                                </div>
+                            </div>
+                            <small>Gabung Newsletter Kami</small>
+                        </div>
+                    </div>
+                    <!-- Newsletter End -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Contact End -->
+
+    {% include 'snippets/footer.html' %}
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary btn-square back-to-top"><i class="fa fa-arrow-up"></i></a>
+
+    <script>
+        function scrollToElementById(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    
+        const urlParams = new URLSearchParams(window.location.search);
+        const scrollTo = urlParams.get('scroll_to');
+        if (scrollTo) {
+            scrollToElementById(scrollTo);
+        }
+    </script>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+{% endblock content %}

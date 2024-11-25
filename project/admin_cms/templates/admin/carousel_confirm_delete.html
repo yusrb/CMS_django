@@ -1,0 +1,18 @@
+<h1>Yakin ingin menghapus
+    {{carousel.judul}}</h1>
+
+{% if carousel.foto %}
+    <img src="{{ carousel.foto.url }}" alt="{{ carousel.judul }}">
+{% else %}
+    Tidak ada gambar
+{% endif %}
+
+<form action="{% url 'admins:carousel_delete' carousel.pk %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Ya">
+    <a href="{% url 'admins:carousel_list' %}">
+        <input type="button" value="Tidak">
+    </a>
+</form>
+
+<a href="{% url 'admins:carousel_list' %}">Kembali</a>

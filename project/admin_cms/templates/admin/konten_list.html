@@ -1,0 +1,30 @@
+<form action="{% url 'user:user_logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
+
+<h1>Daftar Konten</h1>
+<a href="{% url 'admins:konten_create' %}">Tambah Konten</a>
+<table>
+    <tr>
+        <th>Judul</th>
+        <th>Foto</th>
+        <th>Aksi</th>
+    </tr>
+    {% for konten in kontens %}
+    <tr>
+        <td>{{ konten.judul }}</td>
+        <td>
+            {% if konten.foto %}
+                <img src="{{ konten.foto.url }}" alt="{{ konten.judul }}" width="100">
+            {% else %}
+                <p>Tidak ada gambar</p>
+            {% endif %}
+        </td>
+        <td>
+            <a href="{% url 'admins:konten_update' konten.pk %}">Edit</a>
+            <a href="{% url 'admins:konten_delete' konten.pk %}">Hapus</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>

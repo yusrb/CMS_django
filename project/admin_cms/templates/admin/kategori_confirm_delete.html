@@ -1,0 +1,11 @@
+<h1>Yakin ingin menghapus kategori {{kategori.kategori}}</h1>
+
+<form action="{% url 'admins:kategori_delete' kategori.pk %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Ya">
+    <a href="{% url 'admins:kategori_list' %}">
+        <input type="button" value="Tidak">
+    </a>
+</form>
+
+<a href="{% url 'admins:kategori_list' %}">Kembali</a>

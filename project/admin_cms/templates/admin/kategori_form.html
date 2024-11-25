@@ -1,0 +1,12 @@
+<h1>{{judul}}</h1>
+
+<form action="" method="post">
+    <table>
+        {% csrf_token %}
+        {{form.as_table}}
+    </table>
+    <button type="submit">{{submit}}</button>
+    <br>
+</form>
+
+<a href="{% url 'admins:kategori_list' %}">Kembali</a>

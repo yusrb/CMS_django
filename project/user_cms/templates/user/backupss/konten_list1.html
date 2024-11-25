@@ -1,0 +1,205 @@
+{% include 'base.html' %}
+<!-- Navbar -->
+<header class="bg-black text-white z-10" style="background-color: {{ konfigurasis.navbar_page_color }};">
+    <div class="container relative left-5 mx-auto flex flex-col text-white items-center py-4 px-6">
+        <h1 class="text-4xl font-bold mb-2">Aspire CMS</h1>
+
+        <div class="flex items-center w-full mb-4 justify-between">
+            <!-- Kategori Section -->
+            <ul class="flex flex-wrap justify-center space-x-4 flex-grow">
+                <li>
+                    <button class="kategori-btn text-white relative top-[5px] hover:underline" data-kategori-id="all">Semua Kategori</button>
+                </li>
+                {% for kategori in kategori_kontens %}
+                    <li>
+                        <button class="kategori-btn text-white relative top-[5px] hover:underline" data-kategori-id="{{ kategori.pk }}">{{ kategori.kategori }}</button>
+                    </li>
+                {% empty %}
+                <li class="text-gray-500">Tidak ada kategori tersedia.</li>
+                {% endfor %}
+            </ul>
+
+            <!-- User Icon -->
+            <div class="relative top-1 flex items-center">
+                <button id="profile-button" class="flex items-center ml-4">
+                    <i class='bx bx-user text-2xl'></i>
+                </button>
+                <!-- Dropdown User Menu -->
+                <div id="user-dropdown" class="absolute z-50 right-0 mt-2 w-48 bg-white text-black rounded-md shadow-lg hidden transition-opacity duration-300 ease-in-out opacity-0">
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-200 rounded-t-md">Profil</a>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-200">Pengaturan</a>
+                    <a href="#" class="block px-4 py-2 hover:bg-gray-200 rounded-b-md">Keluar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Carousel Section -->
+<section class="relative bg-cover bg-center z-0">
+    <div class="container mx-auto py-10">
+        <div id="default-carousel" class="relative w-full" data-carousel="slide">
+            <div class="relative h-56 overflow-hidden rounded-lg md:h-96">
+                <!-- Carousel items -->
+                {% for carousel in carousel_kontens %}
+                    <div class="hidden duration-700 ease-in-out" data-carousel-item="data-carousel-item">
+                        <img src="{{ carousel.foto.url }}" class="block w-full" alt="{{ carousel.judul }}">
+                        <div class="absolute bottom-0 bg-opacity-50 bg-black w-full p-4">
+                            <h3 class="text-white text-xl">{{ carousel.judul }}</h3>
+                        </div>
+                    </div>
+                {% empty %}
+                <div class="hidden duration-700 ease-in-out" data-carousel-item="data-carousel-item">
+                    <img src="https://via.placeholder.com/800x400.png?text=Carousel+Image+1" class="block w-full" alt="Image 1">
+                    <div class="absolute bottom-0 bg-opacity-50 bg-black w-full p-4">
+                        <h3 class="text-white text-xl">none</h3>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Slider controls -->
+            <button type="button" class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-prev="data-carousel-prev">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50 group-focus:ring-4 group-focus:ring-white group-focus:outline-none">
+                    <svg aria-hidden="true" class="w-6 h-6 text-white dark:text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span class="sr-only">Previous</span>
+                </span>
+            </button>
+            <button type="button" class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none" data-carousel-next="data-carousel-next">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 group-hover:bg-white/50 group-focus:ring-4 group-focus:ring-white group-focus:outline-none">
+                    <svg aria-hidden="true" class="w-6 h-6 text-white dark:text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    <span class="sr-only">Next</span>
+                </span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<div class="container mx-auto py-10 px-4 flex">
+    <div class="flex-1">
+        <h2 class="text-2xl font-bold mb-4">Daftar Konten</h2>
+        <div class="flex flex-col gap-6">
+            {% for konten in kontens %}
+                <div class="bg-white shadow-md rounded-lg p-6 konten-item" data-kategori-id="{{ konten.kategori_id }}">
+                    <h3 class="text-xl font-semibold">{{ konten.judul }}</h3>
+                    {% if konten.foto %}
+                        <img src="{{ konten.foto.url }}" alt="{{ konten.judul }}" class="mt-2 rounded-md object-cover h-48 w-full">
+                    {% else %}
+                        <p class="mt-2 text-gray-500">Tidak ada gambar</p>
+                    {% endif %}
+                    <p class="text-gray-600">{{ konten.tanggal|date:"d M Y, H:i" }} WIB</p>
+                    <p>Ditulis oleh {{ konten.username }}</p>
+                    <p class="text-gray-800 mt-1">{{ konten.isi_konten|truncatewords:20|safe }}</p>
+                    <a href="{% url 'user:konten_detail' konten.slug %}" class="text-blue-500 hover:underline mt-2 inline-block">Baca Selengkapnya</a>
+                </div>
+            {% empty %}
+            <p class="text-center text-gray-500 col-span-full">Tidak ada konten yang tersedia saat ini.</p>
+            {% endfor %}
+        </div>
+
+        <!-- No Content Message -->
+        <div id="no-content-message" class="text-center text-gray-500 mt-16 hidden">
+            <p>Belum ada konten di kategori ini.</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination flex justify-center py-6">
+            {% if is_paginated %}
+                <span class="flex items-center space-x-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="text-blue-500 hover:underline">First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="text-blue-500 hover:underline">Previous</a>
+                    {% endif %}
+                    <span class="text-gray-600">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="text-blue-500 hover:underline">Next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="text-blue-500 hover:underline">Last</a>
+                    {% endif %}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-1/4 ml-7">
+        <!-- Post Terbaru -->
+        <div class="bg-white rounded-lg shadow-md p-4 mt-11 mb-6">
+            <h3 class="text-lg font-bold mb-4">Post Terbaru</h3>
+            <ul class="flex flex-col space-y-2">
+                {% for post_terbaru in post_terbarus %}
+                    <li>
+                        <a href="{% url 'user:konten_detail' post_terbaru.slug %}" class="text-blue-500 hover:underline">{{ post_terbaru.judul }}</a>
+                    </li>
+                {% empty %}
+                <li class="text-gray-500">Tidak ada post terbaru.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Top Post -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h3 class="text-lg font-bold mb-4">Top Posts</h3>
+            <ul class="flex flex-col space-y-2">
+                {% for top in top_posts %}
+                    <li>
+                        <a href="{% url 'user:konten_detail' top.slug %}" class="text-blue-500 hover:underline">{{ top.judul }}</a>
+                    </li>
+                {% empty %}
+                <li class="text-gray-500">Tidak ada post populer.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Search Section -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <h3 class="text-lg font-bold mb-4">Pencarian</h3>
+            <input type="text" placeholder="Cari konten..." class="w-full px-3 py-2 border rounded-lg">
+        </div>
+    </aside>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const profileButton = document.getElementById('profile-button');
+        const dropdown = document.getElementById('user-dropdown');
+
+        profileButton.addEventListener('click', () => {
+            dropdown.classList.toggle('hidden');
+        });
+
+        window.addEventListener('click', (event) => {
+            if (!profileButton.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const kategoriButtons = document.querySelectorAll('.kategori-btn');
+        const kontenItems = document.querySelectorAll('.konten-item');
+        const noContentMessage = document.getElementById('no-content-message');
+
+        kategoriButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const kategoriId = button.getAttribute('data-kategori-id');
+                let hasContent = false;
+
+                kontenItems.forEach(item => {
+                    const itemKategoriId = item.getAttribute('data-kategori-id');
+
+                    if (kategoriId === "all" || kategoriId === itemKategoriId) {
+                        item.style.display = 'block';
+                        hasContent = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                noContentMessage.style.display = hasContent ? 'none' : 'block';
+            });
+        });
+    });
+</script>

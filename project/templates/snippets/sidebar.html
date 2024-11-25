@@ -1,0 +1,132 @@
+<div class="col-lg-4">
+  {% if konfigurasi_home %}
+      <div class="mb-3">
+          <div class="section-title mb-0">
+              <h4 class="m-0 text-uppercase font-weight-bold">Follow Us</h4>
+          </div>
+          <div class="bg-white border border-top-0 p-3">
+              {% if konfigurasi_home.x %}
+              <a href="{{ konfigurasi_home.x }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #1DA1F2;">
+                  <i class="fab fa-twitter text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                  <span class="font-weight-medium">X</span>
+              </a>
+              {% endif %}
+              {% if konfigurasi_home.facebook %}
+              <a href="{{ konfigurasi_home.facebook }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #39569E;">
+                  <i class="fab fa-facebook-f text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                  <span class="font-weight-medium">Facebook</span>
+              </a>
+              {% endif %}
+              {% if konfigurasi_home.linkedin %}
+              <a href="{{ konfigurasi_home.linkedin }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #0077B5;">
+                  <i class="fab fa-linkedin-in text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                  <span class="font-weight-medium">Linkedin</span>
+              </a>
+              {% endif %}
+              {% if konfigurasi_home.instagram %}
+              <a href="{{ konfigurasi_home.instagram }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #52AAF4;">
+                  <i class="fab fa-instagram text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                  <span class="font-weight-medium">Instagram</span>
+              </a>
+              {% endif %}
+              {% if konfigurasi_home.tiktok %}
+              <a href="{{ konfigurasi_home.tiktok }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: black;">
+                  <i class="fab fa-tiktok text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                  <span class="font-weight-medium">Tik Tok</span>
+              </a>
+              {% endif %}
+          </div>
+      </div>
+  {% else %}
+      <div class="mb-3">
+          <div class="section-title mb-0">
+              <h4 class="m-0 text-uppercase font-weight-bold">Follow Us</h4>
+          </div>
+          <div class="bg-white border border-top-0 p-3 text-center">
+              <p class="text-md">Belum ada Social Media.</p>
+          </div>
+      </div>
+  {% endif %}
+
+  <!-- Popular News Start -->
+  <div class="mb-3">
+      <div class="section-title mb-0">
+          <h4 class="m-0 text-uppercase font-weight-bold">Trending News</h4>
+      </div>
+      <div class="bg-white border border-top-0 p-3">
+          {% for post in top_posts|slice:":5" %}
+          <div class="d-flex align-items-center bg-white mb-3" style="height: 110px;">
+              <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
+                  <div class="mb-2">
+                      <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="{% url 'user:kategori_detail' post.kategori.pk %}">{{ post.kategori }}</a>
+                      <a class="text-body" href="{% url 'user:konten_tanggal_list' %}"><small>{{ post.tanggal|date:"d M, Y" }}</small></a>
+                  </div>
+                  <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="{% url 'user:konten_detail' post.slug %}">{{ post.judul|truncatechars:18 }}</a>
+              </div>
+          </div>
+          {% endfor %}
+      </div>
+  </div>
+  <!-- Popular News End -->
+
+  <!-- Tags Start -->
+  <div class="mb-3">
+      <div class="section-title mb-0">
+          <h4 class="m-0 text-uppercase font-weight-bold">Tags</h4>
+      </div>
+      <div class="bg-white border border-top-0 p-3">
+          <div class="d-flex flex-wrap m-n1">
+              {% for kategori in kategoris %}
+                  <a href="{% url 'user:kategori_detail' kategori.pk %}" class="btn btn-sm btn-outline-secondary m-1">{{ kategori.kategori }}</a>
+                  {% if forloop.counter|divisibleby:3 %}
+                      <div class="w-100"></div>
+                  {% endif %}
+              {% endfor %}
+          </div>
+      </div>
+  </div>                    
+  <!-- Tags End -->
+
+  <!-- Saran Form Start -->
+  <div class="mb-3">
+      <div class="section-title mb-0">
+          <h4 class="m-0 text-uppercase font-weight-bold">Kirim Saran</h4>
+      </div>
+      <div class="bg-white text-center border border-top-0 p-3">
+        <p class="text-[14px]">Silakan masukkan saran Anda di bawah ini:</p>
+
+        {% if request.path == '/kategori/' %}
+        <form action="{% url 'user:saran_create' %}?asal=kategori_list&pk={{ kategori.pk }}" method="post">
+        {% elif request.path == '/post/latest' %}
+        <form action="{% url 'user:saran_create' %}?asal=konten_latest" method="post">
+        {% elif request.path == '/post/tanggal/' %}
+        <form action="{% url 'user:saran_create' %}?asal=kontens_by_date" method="post">
+        {% elif '/kategori/detail/' in request.path %}
+        <form action="{% url 'user:saran_create' %}?asal=kategori_detail&pk={{ kategori.pk }}" method="post">
+        {% else %}
+        <form action="{% url 'user:saran_create' %}?asal=saran_form" method="post">
+        {% endif %}
+            {% csrf_token %}
+            <div class="form-group">
+                <textarea class="form-control form-control-lg" name="isi_saran" placeholder="Isi Saran" rows="4" required></textarea>
+            </div>
+            <div class="input-group mb-2" style="width: 100%;">
+                <input type="text" class="form-control form-control-lg mb-3" name="nama" value="{{ request.user.nama }}" placeholder="Nama" required>
+                <div class="input-group-append">
+                    <input type="email" class="form-control form-control-lg" name="email" value="{{ request.user.email }}" placeholder="Email" required>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary font-weight-bold px-3" type="submit">Kirim Saran</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <small class="text-success" id="saran_form">{{ message }}</small>
+            {% endfor %}
+        {% endif %}
+    </div>    
+  </div>
+  <!-- Saran Form End -->
+</div>  

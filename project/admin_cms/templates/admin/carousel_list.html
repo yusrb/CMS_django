@@ -1,0 +1,37 @@
+<div class="container">
+    <h1>Daftar Carousel</h1>
+
+    <a href="{% url 'admins:carousel_create' %}" class="">Tambah Carousel</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Judul</th>
+                <th>Foto</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for carousel in carousels %}
+                <tr>
+                    <td>{{ carousel.judul }}</td>
+                    <td>
+                        {% if carousel.foto %}
+                            <img src="{{ carousel.foto.url }}" alt="{{ carousel.judul }}">
+                        {% else %}
+                            Tidak ada gambar
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'admins:carousel_update' carousel.pk %}">Edit</a> |
+                        <a href="{% url 'admins:carousel_delete' carousel.pk %}">Hapus</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">Tidak ada carousel</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

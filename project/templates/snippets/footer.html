@@ -1,0 +1,72 @@
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark pt-5 px-sm-3 px-md-5 mt-5">
+        <div class="row py-4">
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h5 class="mb-4 text-white text-uppercase font-weight-bold">Get In Touch</h5>
+                {% if konfigurasi_home %}
+                <p class="font-weight-medium"><i class="fa fa-map-marker-alt mr-2"></i>{{konfigurasi_home.alamat}}</p>
+                <p class="font-weight-medium"><i class="fa fa-phone-alt mr-2"></i>{{konfigurasi_home.user.telepon}}</p>
+                <p class="font-weight-medium"><i class="fa fa-envelope mr-2"></i>{{konfigurasi_home.email}}</p>
+                <h6 class="mt-4 mb-3 text-white text-uppercase font-weight-bold">Follow Us</h6>
+                <div class="d-flex justify-content-start">
+                    
+                    {% if konfigurasi_home.x %}
+                    <a class="btn btn-lg btn-secondary btn-lg-square mr-2" href="{{konfigurasi_home.x}}"><i class="fab fa-twitter"></i></a>
+                    {% endif %}
+                    {% if konfigurasi_home.facebook %}
+                    <a class="btn btn-lg btn-secondary btn-lg-square mr-2" href="{{konfigurasi_home.facebook}}"><i class="fab fa-facebook-f"></i></a>
+                    {% endif %}
+                    {% if konfigurasi_home.linkedin %}
+                    <a class="btn btn-lg btn-secondary btn-lg-square mr-2" href="{{konfigurasi_home.linkedin}}"><i class="fab fa-linkedin-in"></i></a>
+                    {% endif %}
+                    {% if konfigurasi_home.instagram %}
+                    <a class="btn btn-lg btn-secondary btn-lg-square mr-2" href="{{konfigurasi_home.instagram}}"><i class="fab fa-instagram"></i></a>
+                    {% endif %}
+                    {% if konfigurasi_home.tiktok %}
+                    <a class="btn btn-lg btn-secondary btn-lg-square" href="{{konfigurasi_home.tiktok}}"><i class="fab fa-tiktok"></i></a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h5 class="mb-4 text-white text-uppercase font-weight-bold">Popular News</h5>
+                {% for konten in top_posts|slice:":4" %}
+                    <div class="mb-3">
+                        <div class="mb-2">
+                            <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="{% url 'user:kategori_detail' konten.kategori.pk %}">{{konten.kategori}}</a>
+                            <a class="text-body" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ konten.tanggal|date:'Y-m-d' }}"><small>{{konten.tanggal|date:"d M, Y"}}</small></a>
+                        </div>
+                        <a class="small text-body text-uppercase font-weight-medium" href="{% url 'user:konten_detail' konten.slug %}">{{konten.judul}}</a>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h5 class="mb-4 text-white text-uppercase font-weight-bold">Categories</h5>
+                <div class="m-n1">
+                    {% for kategori in kategoris %}
+                    <a href="{% url 'user:kategori_detail' kategori.pk %}" class="btn btn-sm btn-secondary m-1">{{kategori.kategori}}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                <h5 class="mb-4 text-white text-uppercase font-weight-bold">Flickr Photos</h5>
+                <div class="row">
+                    {% for galeri in galeris %}
+                        <div class="col-4 mb-3">
+                            <a href=""><img class="w-100" src="{{ galeri.foto.url }}" alt=""></a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid py-4 px-sm-3 px-md-5" style="background: #111111;">
+        <p class="m-0 text-center">&copy; <a href="{% url 'user:konten_list' %}">{{konfigurasi_home.judul_website}} CMS</a>. All Rights Reserved. 
+
+        {% if design_user.pk is not request.user.pk %}
+		Design by <a href="{% url 'user:user_detail' 1 %}">{{design_user.nama}}</a></p>
+        {% else %}
+        Design by <a href="{% url 'user:user_profil' 1 %}">{{design_user.nama}}</a></p>
+        {% endif %}
+    </div>
+    <!-- Footer End -->
