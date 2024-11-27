@@ -16,12 +16,16 @@ class User(AbstractUser):
     about = models.CharField(max_length=100 , null=True, blank=True)
     telepon = models.CharField(max_length=20)
     level = models.CharField(max_length=15, choices=LEVEL_CHOICES, default='User')
-    foto = models.ImageField(upload_to="user_foto/" , null=True , blank=True , default="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKsAAACUCAMAAADbGilTAAAAMFBMVEXk5ueutLenrrHg4+Tn6eqqsLTN0NLT1tjY29zGysy4vcC/xMbJzc/b3t/q7O2xt7pnBWjmAAAD/klEQVR4nO2cW7LbIAxADQiDIcD+d1ucx62TJr6AbIlMOR+dfp4qAiSQO02DwWAwGAwGg8FgMBicAQC3QQkxRmWNMTaoGHs2VmH2Qkqptc5/yuRNyDHmtvoXAHtxQost2dnPtreEgGhdehZ9+CYfIrfeE8G9Fb1H16luQgtqkZ9Vr7pLJ7ZgdoL6kHW2B1lYfhO9MfPLKv9rUH/ygFvVlZmusp45suWqqyynaUVUb7KMaeCrVNec5UqDuBQuqw2GRxasrFYVwrK4qtSgKhxLyhaeAS/oC0MW2PpkvSLpAwvvS8ACyI8EMK2qIpGXMXWnwHNgaU3BtKsKEWhla0+sLcRbQcCEVWjKBgzm5pW1IilPWkCsrBVPGFhoqQQ2JDrVqalq2UK3xUJpj/URukYxItNVCLqau60a3ELXzAS0K1kVCxarKhLVMYsrBm5QtTIwo1U1mesF7Sq/yFWb4XqGK10OfNPa+qY9C+9KdhZ80xmLr100nSug47pQqeZaG+tKV2sjLojuEF4TfVNviE1Y0p4bd5ehSV8NkHdEtJeaqLs32pcjXPlC/RaDWF3UT52YLZb8Pa5926J/7gbTeB4wvBm1bgV64Zgqsl/0xtmWBVQN7Aux4RqWb0Kn9h6Wc+SlsvHSjs00o6pcWVUnqGgT+ccK96Yen1U9t2qmTFbTta47wFyQB8n0MQQLwe+fClr7wP/7PzBiJxFk4hl0+gCAeZ8I+Z/gmObHPgOTWZLWr8PlbjG9zZavwBTWUfjryP51al/7i1U9zuzfyUG0Zs6YoHoM6AZYiSvXv/Upmw1zDoQ1psuNHNr1SxOIXSlff/fFpbc7QUo5a3v4mAdABTv7JPe+L1iXmcj7QWBcZxCVufi0dwpshXX2nQNLgPPu7+ubw+TmibgwAGX97u++E2Dp5kCWDNevnzTiAlYLb0hsP3/9VGWbc+Fs23zqo0UfXE691cimDjtF9hed5vOq2mjR71ovuMs5exioo01XzijDYcIPDbxFHt7e5pbqqCX1ij64b4gnBfXOgbdcOVOPW/3v0IeN8UPx1Uq77EF3nQdMD5bYHvE+d8DQUJks/tXrgFmsUlmHrBBO3gCeZXGRRb6918pi7pKpcvVHtj2yNDvAs2xjygJuoKGNxs961OlHwDvaioMzSsDfSQ3dAn4GqxFX35MrJlWh60sDngxYqZ03pd+uNtS+LqG/zkGgqwLLtrBuVC2viB5wRSEr2kVo/Vb7KCqOWuynj2gqtgL87DiWuTisxKXgG4qLw1Mug+oo3rbqBkPOcS09aNFfvx5A4Rbb8l+hHI4sdGXfBUTxhGTsIAWKx897cC1svLgP2BtFxyzMsgdcUVxVUD1Qojr43/gDTjs3mRf1UggAAAAASUVORK5CYII=")
+    foto = models.ImageField(upload_to="user_foto/" , null=True , blank=True)
     recent_login = models.DateTimeField(auto_now=True)
     theme = models.ForeignKey(Theme, on_delete=models.CASCADE, null=True, blank=True)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'nama', 'level']
+
+    class Meta:
+        verbose_name = "User"
+        verbose_name_plural = "User-User"
     
     def __str__(self):
         return self.username
@@ -48,10 +52,36 @@ class User(AbstractUser):
                 permission = Permission.objects.get(codename=perm)
                 self.user_permissions.add(permission)
 
+class Komunitas(models.Model):
+    nama = models.CharField(max_length=30)
+    deskripsi = models.TextField()
+    foto_komunitas = models.ImageField(upload_to="komunitas_foto/")
+    tanggal = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField(default=True)
+    jumlah_pertanyaan = models.IntegerField(default=0, null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Komunitas"
+        verbose_name_plural = "Komunitas-Komunitas"
+
+    def update_pertanyaan_count(self):
+        self.jumlah_pertanyaan = self.pertanyaan_set.count()
+        self.save()
+
+    def get_pertanyaan_terkait(self):
+        return self.pertanyaan_set.all()
+
+    def __str__(self):
+        return self.nama
+
 class Aktivitas(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     aksi = models.CharField(max_length=255)
     tanggal = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Aktivitas"
+        verbose_name_plural = "Aktivitas User"
 
     def __str__(self):
         return f"{self.user.username} - {self.aksi} pada {self.tanggal}"
@@ -60,6 +90,10 @@ class Kategori(models.Model):
     kategori = models.CharField(max_length=60)
     foto = models.ImageField(upload_to='kategori_foto/')
 
+    class Meta:
+        verbose_name = "Kategori"
+        verbose_name_plural = "Kategori-Kategori"
+
     def __str__(self):
         return self.kategori
 
@@ -67,16 +101,11 @@ class Kategori(models.Model):
 class KontenDilihat(models.Model):
     konten = models.ForeignKey('user_cms.Konten', related_name="dilihats", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+
     class Meta:
+        verbose_name = "Konten Dilihat"
+        verbose_name_plural = "Konten Dilihat"
         unique_together = ('konten', 'user')
-
-class Carousel(models.Model):
-    judul = models.CharField(max_length=60)
-    foto = models.ImageField(upload_to="carousel_foto/")
-
-    def __str__(self):
-        return self.judul
 
 class Konfigurasi(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='konfigurasi')
@@ -93,6 +122,8 @@ class Konfigurasi(models.Model):
     url_iklan = models.CharField(max_length=100, blank=True, null=True , help_text="Masukkan Url iklan yang telah disepakati ('opsional')")
 
     class Meta:
+        verbose_name = "Konfigurasi Admin"
+        verbose_name_plural = "Konfigurasi Admin"
         unique_together = ('user',)
 
     def __str__(self):
@@ -102,6 +133,10 @@ class Galeri(models.Model):
     judul = models.CharField(max_length=60)
     foto = models.ImageField(upload_to="galeri_foto/")
     tanggal = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Galeri"
+        verbose_name_plural = "Galeri-Galeri"
 
     def __str__(self):
         return self.judul

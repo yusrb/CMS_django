@@ -24,8 +24,8 @@
             <div class="col-12">
                 <div class="d-flex align-items-center justify-content-start">
                     <!-- Judul Another Contens-->
-                    <div class="section-title border-right-0 mb-0" style="flex: 0 0 140px;">
-                        <h4 class="ml-1 m-0 text-uppercase font-weight-bold" style="font-size: 18px;">Another Contents
+                    <div class="section-title border-right-0 mb-0" style="flex: 0 0 158px;">
+                        <h4 class="ml-1 m-0 text-uppercase font-weight-bold border-r-2" style="font-size: 18px;">Another Contents
                         </h4>
                     </div>
                     <!-- Carousel Konten Lainnya -->
@@ -77,6 +77,7 @@
                                     width="25" height="25" alt="Default Profile Picture">
                                 {% endif %}
                                 <span class="font-semibold">{{konten.user.username}}</span>
+                                {% comment %} <span class="text-[10px]">{{konten.user.about}}</span> {% endcomment %}
                             </div>
                         </a>
                         {% else %}

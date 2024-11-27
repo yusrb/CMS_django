@@ -2,11 +2,11 @@ from django.contrib import admin
 from django.utils.timezone import localtime
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
-from admin_cms.models import User, Aktivitas, Kategori, Carousel, Konfigurasi, Galeri
-from user_cms.models import Konten
-from user_cms.models import Saran , Komen , Reply
+from admin_cms.models import User, Aktivitas, Kategori, Konfigurasi, Galeri, Komunitas
+from user_cms.models import Konten, Saran, Komen, Balasan, Pertanyaan
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
+# UserAdmin
 class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'nama', 'email', 'level', 'theme')
     list_filter = ('is_active', 'is_staff', 'level', 'telepon')
@@ -25,6 +25,7 @@ class UserAdmin(BaseUserAdmin):
             return qs
         return qs.filter(id=request.user.id)
 
+# AktivitasAdmin
 class AktivitasAdmin(admin.ModelAdmin):
     list_display = ('user', 'aksi', 'tanggal')
     list_filter = ('user',)
@@ -37,6 +38,7 @@ class AktivitasAdmin(admin.ModelAdmin):
             return qs
         return qs.exclude(user__is_superuser=True)
 
+# KontenAdmin
 class KontenAdmin(admin.ModelAdmin):
     list_display = ('judul', 'kategori', 'formatted_tanggal', 'dilihat', 'username')
     search_fields = ('judul',)
@@ -76,6 +78,7 @@ class KontenAdmin(admin.ModelAdmin):
             return obj.user == request.user or request.user.is_superuser
         return True
 
+# KonfigurasiAdmin
 class KonfigurasiAdmin(admin.ModelAdmin):
     readonly_fields = ['tampil_user']
 
@@ -84,7 +87,7 @@ class KonfigurasiAdmin(admin.ModelAdmin):
             'fields': ('tampil_user',),
         }),
         ('Informasi Website', {
-            'fields': ('judul_website', 'x' ,'instagram', 'linkedin' ,'facebook', 'tiktok', 'alamat', 'email' , 'iklan' , 'url_iklan')
+            'fields': ('judul_website', 'x', 'instagram', 'linkedin', 'facebook', 'tiktok', 'alamat', 'email', 'iklan', 'url_iklan')
         }),
     )
 
@@ -110,13 +113,48 @@ class KonfigurasiAdmin(admin.ModelAdmin):
             return obj.user == request.user
         return True
 
+# Komunitas Admin
+class KomunitasAdmin(admin.ModelAdmin):
+    list_display = ('nama', 'status', 'jumlah_pertanyaan', 'tanggal')
+    list_filter = ('status',)
+    search_fields = ('nama',)
+    readonly_fields = ['jumlah_pertanyaan']
+    ordering = ('-tanggal',)
+
+    def save_model(self, request, obj, form, change):
+        if not obj.jumlah_pertanyaan:
+            obj.jumlah_pertanyaan = 0
+            
+        obj.save()
+
+        if hasattr(obj, 'update_pertanyaan_count'):
+            obj.update_pertanyaan_count()
+
+        super().save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(status=True)
+
+# Pertanyaan Admin
+@admin.register(Pertanyaan)
+class PertanyaanAdmin(admin.ModelAdmin):
+    list_display = ('judul', 'komunitas', 'created_at', 'penulis')
+    ordering = ['created_at']
+
+    def komunitas(self, obj):
+        return obj.komunitas.nama
+    komunitas.short_description = 'Komunitas'
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Aktivitas, AktivitasAdmin)
 admin.site.register(Kategori)
 admin.site.register(Saran)
 admin.site.register(Komen)
-admin.site.register(Reply)
+admin.site.register(Komunitas, KomunitasAdmin)
+admin.site.register(Balasan)
 admin.site.register(Konten, KontenAdmin)
-admin.site.register(Carousel)
 admin.site.register(Konfigurasi, KonfigurasiAdmin)
 admin.site.register(Galeri)

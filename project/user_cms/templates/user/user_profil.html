@@ -119,12 +119,16 @@
                         <div class="d-flex align-items-center bg-white mb-3" style="height: 110px;">
                             <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
                                 <div class="mb-2">
-                                    <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="{{ post.kategori.url }}">{{ post.kategori }}</a>
-                                    <a class="text-body" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ konten.tanggal|date:'Y-m-d' }}">
-                                        <small>{{ konten.tanggal|date:"M d, Y" }}</small>
+                                    <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="{% url 'user:kategori_detail' post.kategori.pk %}">{{ post.kategori }}</a>
+                                    <a class="text-body" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ post.tanggal|date:'Y-m-d' }}">
+                                        <small>{{ post.tanggal|date:"M d, Y" }}</small>
                                     </a>
                                 </div>
                                 <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="{% url 'user:konten_detail' post.slug %}">{{ post.judul|truncatechars:18 }}</a>
+                                <div class="flex relative left-[13rem]">
+                                    <small class="ml-3"><i class="far fa-eye mr-[6px]"></i>{{ post.dilihat }}</small>
+                                    <small class="ml-[11px]"><i class="far fa-comment mr-[6px]"></i>{{ post.total_komentar }}</small>
+                                </div>
                             </div>
                         </div>
                         {% empty %}

@@ -17,15 +17,16 @@ from django.db.models import Q, Count
 from admin_cms.models import (
     User,
     Galeri,
-    Carousel,
     Kategori,
     Konfigurasi,
     KontenDilihat,
+    Komunitas,
     )
 from user_cms.models import (
     Konten,
     Komen,
-    Reply,
+    Balasan,
+    Pertanyaan,
 )
 from .forms import (
     LevelChoiceForm,
@@ -144,7 +145,7 @@ class UserProfilView(LoginRequiredMixin, DetailView):
             )
 
         context["judul"] = 'Profil User'
-        context['top_posts'] = Konten.objects.filter(user=self.get_object().pk).order_by('-dilihat')[:5]
+        context['top_posts'] = Konten.objects.filter(user=self.get_object().pk).order_by('-dilihat')[:5].annotate(total_komentar=Count('komentar') + Count('komentar__replies'))
         context["kategoris"] = Kategori.objects.all()
         context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["konfigurasi_home"] = Konfigurasi.objects.filter(user_id=1).first()
@@ -187,7 +188,7 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 
         context["judul"] = 'Detail User'
         context['top_posts_user'] = Konten.objects.filter(user=self.get_object().pk).order_by('-dilihat')[:5]
-        context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
+        context['top_posts'] = Konten.objects.order_by('-dilihat')[:5].annotate(total_komentar=Count('komentar') + Count('komentar__replies'))
         context["kategoris"] = Kategori.objects.all()
         context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["design_user"] = get_object_or_404(User, pk=1)
@@ -216,6 +217,21 @@ class UserSosmedUpdate(View):
 
         konfigurasi.save()
         return redirect('user:user_profil', pk=request.user.pk)
+
+class KomunitasListView(ListView):
+    model = Komunitas
+    template_name = "user/Komunitas/komunitas_list.html"
+    context_object_name = 'komunitas'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['judul'] = "Komunitas"
+        context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
+        context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
+        context["kategoris"] = Kategori.objects.all()
+        context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
+        context["design_user"] = get_object_or_404(User, pk=1)
+        return context
 
 class ContactView(ListView):
     model = Konfigurasi
@@ -270,7 +286,7 @@ class KontenListView(LoginRequiredMixin, ListView):
         context['kategoris'] = Kategori.objects.all()
         context['post_terbarus'] = Konten.objects.filter(
             tanggal__lte=timezone.now()
-        ).order_by('-tanggal')[:5].annotate(total_komentar=Count("komentar"))
+        ).order_by('-tanggal')[:4].annotate(total_komentar=Count("komentar") + Count("komentar__replies"))
         context['top_posts'] = Konten.objects.order_by('-dilihat').annotate(total_komentar=Count("komentar"))[:5]
         context['konfigurasis'] = Konfigurasi.objects.filter(user=self.request.user)
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
