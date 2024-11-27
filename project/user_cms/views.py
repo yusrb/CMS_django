@@ -32,7 +32,8 @@ from .forms import (
     LevelChoiceForm,
     CustomUserCreationForm,
     KonfigurasiForm,
-    KomenForm
+    KomenForm,
+    PertanyaanForm,
     )
 
 class UserLoginView(LoginView):
@@ -232,6 +233,36 @@ class KomunitasListView(ListView):
         context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["design_user"] = get_object_or_404(User, pk=1)
         return context
+
+class KomunitasDetailView(DetailView):
+    model = Komunitas
+    template_name = "user/Komunitas/komunitas_detail.html"
+    context_object_name = "komunitas"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["judul"] = self.get_object().nama
+        context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
+        context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
+        context["kategoris"] = Kategori.objects.all()
+        context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
+        context["design_user"] = get_object_or_404(User, pk=1)
+        context['pertanyaan_list'] = self.get_object().get_pertanyaan_terkait().order_by('-created_at')
+        context["form"] = PertanyaanForm()
+        return context
+
+class PertanyaanCreateView(LoginRequiredMixin, CreateView):
+    model = Pertanyaan
+    form_class = PertanyaanForm
+    template_name = "create_pertanyaan.html"
+
+    def form_valid(self, form):
+        komunitas = get_object_or_404(Komunitas, id=self.kwargs['komunitas_id'])
+        form.instance.komunitas = komunitas
+        form.instance.penulis = self.request.user
+        form.save()
+        komunitas.update_pertanyaan_count()
+        return super().form_valid(form)
 
 class ContactView(ListView):
     model = Konfigurasi

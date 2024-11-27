@@ -9,6 +9,8 @@ from .views import (
     UserDetailView,
 
     KomunitasListView,
+    KomunitasDetailView,
+    PertanyaanCreateView,
 
     KontenListView,
     KontenLatestListView,
@@ -40,6 +42,8 @@ urlpatterns = [
     path('update/social/<int:pk>/', UserSosmedUpdate.as_view(), name='update_social'),
 
     path('komunitas/', KomunitasListView.as_view(), name="komunitas_list"),
+    path('komunitas/<int:pk>/', KomunitasDetailView.as_view(), name='komunitas_detail'),
+    path('komunitas/<int:komunitas_id>/tanya/', PertanyaanCreateView.as_view(), name='create_pertanyaan'),
 
     path('' , KontenListView.as_view() , name="konten_list"),
     path('post/latest' , KontenLatestListView.as_view() , name="konten_latest"),

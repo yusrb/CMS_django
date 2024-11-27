@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from admin_cms.models import User, Konfigurasi
-from user_cms.models import Komen , Balasan
+from user_cms.models import Komen , Balasan, Pertanyaan
 from .models import Saran
 
 class UserRegisterForm(UserCreationForm):
@@ -57,7 +57,7 @@ class ReplyForm(forms.ModelForm):
     class Meta:
         model = Balasan
         fields = ['pesan']
-    
+
 class KonfigurasiForm(forms.ModelForm):
     class Meta:
         model = Konfigurasi
@@ -86,3 +86,8 @@ class KonfigurasiForm(forms.ModelForm):
     @property
     def body_color(self):
         return self.cleaned_data.get('body_page_color', '#FFFFFF')
+
+class PertanyaanForm(forms.ModelForm):
+    class Meta:
+        model = Pertanyaan
+        fields = ['judul', 'isi']
