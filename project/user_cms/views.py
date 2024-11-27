@@ -224,6 +224,10 @@ class KomunitasListView(ListView):
     template_name = "user/Komunitas/komunitas_list.html"
     context_object_name = 'komunitas'
 
+    def get_queryset(self):
+        return Komunitas.objects.filter(status=True)
+    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['judul'] = "Komunitas"

@@ -47,7 +47,7 @@ class User(AbstractUser):
                 'can_delete_konten',
                 'can_view_konten'
             ]
-            
+
             for perm in permissions:
                 permission = Permission.objects.get(codename=perm)
                 self.user_permissions.add(permission)
@@ -55,7 +55,7 @@ class User(AbstractUser):
 class Komunitas(models.Model):
     nama = models.CharField(max_length=30)
     deskripsi = models.TextField()
-    foto_komunitas = models.ImageField(upload_to="komunitas_foto/")
+    foto_komunitas = models.ImageField(upload_to="komunitas_foto/", blank=True, null=True)
     tanggal = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=True)
     jumlah_pertanyaan = models.IntegerField(default=0, null=True, blank=True)

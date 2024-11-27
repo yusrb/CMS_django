@@ -37,7 +37,7 @@ class Konten(models.Model):
 class Pertanyaan(models.Model):
     community = models.ForeignKey('admin_cms.Komunitas' , on_delete=models.CASCADE)
     judul = models.CharField(max_length=255)
-    isi = models.TextField()
+    isi = RichTextField()
     penulis = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
     upvotes = models.IntegerField(default=0)

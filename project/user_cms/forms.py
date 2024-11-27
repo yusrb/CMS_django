@@ -91,3 +91,12 @@ class PertanyaanForm(forms.ModelForm):
     class Meta:
         model = Pertanyaan
         fields = ['judul', 'isi']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['judul'].widget.attrs.update({
+            'class': 'mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500'
+        })
+        self.fields['isi'].widget.attrs.update({
+            'class': 'mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500'
+        })
