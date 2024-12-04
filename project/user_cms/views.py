@@ -41,31 +41,33 @@ class UserLoginView(LoginView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('user:konten_list')
+            return redirect(self.get_redirect_url(request.user))
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['judul'] = 'Login Page'
-        context['level_form'] = LevelChoiceForm()
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         return context
 
     def form_valid(self, form):
-        selectTerpilih = self.request.POST.get('level')
-
+        # Ambil user dari form
         user = form.get_user()
 
-        if selectTerpilih != user.level:
-            messages.error(self.request, f"Level '{selectTerpilih}' tidak sesuai dengan akun Anda.")
-            return self.form_invalid(form)
-
+        # Login user
         login(self.request, user)
-        self.request.session['level'] = selectTerpilih
-        return redirect(self.get_success_url())
 
-    def get_success_url(self):
-        return reverse_lazy('user:konfigurasi')
+        # Simpan level user ke session
+        self.request.session['level'] = user.level
+
+        # Redirect sesuai level user
+        if user.level == 'admin':
+            return redirect('user:konfigurasi')
+        elif user.level == 'user':
+            return redirect('user:konten_list')
+        else:
+            # Default redirect jika level tidak dikenali
+            return redirect('user:konten_list')
 
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy('user:konten_list')

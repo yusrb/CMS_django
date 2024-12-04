@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
 from django.utils.timezone import localtime
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
@@ -8,8 +9,8 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # UserAdmin
 class UserAdmin(BaseUserAdmin):
-    list_display = ('username', 'nama', 'email', 'level', 'theme')
-    list_filter = ('is_active', 'is_staff', 'level', 'telepon')
+    list_display = ('username', 'nama', 'email', 'level')
+    # list_filter = ('is_active', 'is_staff', 'level', 'telepon')
     search_fields = ('username', 'email', 'nama')
     ordering = ('username',)
     fieldsets = (
@@ -28,7 +29,7 @@ class UserAdmin(BaseUserAdmin):
 # AktivitasAdmin
 class AktivitasAdmin(admin.ModelAdmin):
     list_display = ('user', 'aksi', 'tanggal')
-    list_filter = ('user',)
+    # list_filter = ('user',)
     search_fields = ('user__username', 'aksi')
     ordering = ('-tanggal',)
 
@@ -116,7 +117,7 @@ class KonfigurasiAdmin(admin.ModelAdmin):
 # Komunitas Admin
 class KomunitasAdmin(admin.ModelAdmin):
     list_display = ('nama', 'status', 'jumlah_pertanyaan', 'tanggal')
-    list_filter = ('status',)
+    # list_filter = ('status',)
     search_fields = ('nama',)
     readonly_fields = ['jumlah_pertanyaan']
     ordering = ('-tanggal',)
@@ -158,3 +159,4 @@ admin.site.register(Balasan)
 admin.site.register(Konten, KontenAdmin)
 admin.site.register(Konfigurasi, KonfigurasiAdmin)
 admin.site.register(Galeri)
+admin.site.unregister(Group)

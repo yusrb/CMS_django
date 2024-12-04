@@ -25,7 +25,7 @@ class User(AbstractUser):
 
     class Meta:
         verbose_name = "User"
-        verbose_name_plural = "User-User"
+        verbose_name_plural = "User"
     
     def __str__(self):
         return self.username
@@ -62,7 +62,7 @@ class Komunitas(models.Model):
 
     class Meta:
         verbose_name = "Komunitas"
-        verbose_name_plural = "Komunitas-Komunitas"
+        verbose_name_plural = "Komunitas"
 
     def update_pertanyaan_count(self):
         self.jumlah_pertanyaan = self.pertanyaan_set.count()
@@ -84,7 +84,9 @@ class Aktivitas(models.Model):
         verbose_name_plural = "Aktivitas User"
 
     def __str__(self):
-        return f"{self.user.username} - {self.aksi} pada {self.tanggal}"
+        formatted_date = self.tanggal.strftime('%d %B %Y')
+        return f"{self.user.username} - {self.aksi} pada {formatted_date}"
+
 
 class Kategori(models.Model):
     kategori = models.CharField(max_length=60)
@@ -92,7 +94,7 @@ class Kategori(models.Model):
 
     class Meta:
         verbose_name = "Kategori"
-        verbose_name_plural = "Kategori-Kategori"
+        verbose_name_plural = "Kategori"
 
     def __str__(self):
         return self.kategori
@@ -136,7 +138,7 @@ class Galeri(models.Model):
 
     class Meta:
         verbose_name = "Galeri"
-        verbose_name_plural = "Galeri-Galeri"
+        verbose_name_plural = "Galeri"
 
     def __str__(self):
         return self.judul

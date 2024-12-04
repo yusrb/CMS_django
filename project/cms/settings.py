@@ -41,8 +41,10 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'tailwind',
     'theme',
-    'django_browser_reload',
+    'admin_argon.apps.AdminArgonConfig',
     'django.contrib.admin',
+    'django_browser_reload',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -57,6 +59,10 @@ TAILWIND_APP_NAME = 'theme'
 
 INTERNAL_IPS = [
     "127.0.0.1",
+]
+
+LOCALE_PATH = [
+    os.path.join(BASE_DIR, 'locale')
 ]
 
 MIDDLEWARE = [
@@ -93,7 +99,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cms.wsgi.application'
 
-LOGOUT_REDIRECT_URL = 'user:konten_list'
+
+AUTH_USER_MODEL = 'admin_cms.User'
+
+LOGIN_URL = 'user:user_login'
+LOGIN_REDIRECT_URL = 'user:konten_list'
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+LOGOUT_REDIRECT_URL = 'user:user_login'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -143,10 +158,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-AUTH_USER_MODEL = 'admin_cms.User'
-
-LOGIN_URL = 'user:user_login'
 
 STATIC_URL = '/static/'
 

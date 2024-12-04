@@ -23,6 +23,7 @@ class Konten(models.Model):
     class Meta:
         verbose_name = "Konten"
         verbose_name_plural = "Konten User"
+        ordering = ['judul']
 
         permissions = [
             ("can_add_konten", "Can add konten"),
