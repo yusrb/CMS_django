@@ -91,7 +91,7 @@
                         <p>{{ komentar.pesan }}</p>
                     </div>
                     {% empty %}
-                    <p class="text-center">Belum ada komentar yang dibuat.</p>
+                    <p class="text-center relative top-1">Belum ada komentar yang dibuat.</p>
                     {% endfor %}
                 </div>
                 <!-- User Comments Activity End -->
@@ -103,7 +103,7 @@
                 <!-- Popular News Start -->
                 <div class="mb-3">
                     <div class="section-title mb-0">
-                        <h4 class="m-0 text-uppercase font-weight-bold">Trending News</h4>
+                        <h4 class="m-0 text-uppercase font-weight-bold">Top News</h4>
                     </div>
                     <div class="bg-white border border-top-0 p-3">
                         {% for post in top_posts_user %}
@@ -135,41 +135,46 @@
                         <h4 class="m-0 text-uppercase font-weight-bold">Social Media</h4>
                     </div>
                     <div class="bg-white border border-top-0 p-3">
-                        {% if user.konfigurasi.x %}
-                        <a href="{{ user.konfigurasi.x }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #1DA1F2;">
-                            <i class="fab fa-twitter text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                            <span class="font-weight-medium">Twitter</span>
-                        </a>
-                        {% endif %}
-                        
-                        {% if user.konfigurasi.facebook %}
-                        <a href="{{ user.konfigurasi.facebook }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #39569E;">
-                            <i class="fab fa-facebook-f text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                            <span class="font-weight-medium">Facebook</span>
-                        </a>
-                        {% endif %}
-                        
-                        {% if user.konfigurasi.linkedin %}
-                        <a href="{{ user.konfigurasi.linkedin }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #0077B5;">
-                            <i class="fab fa-linkedin-in text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                            <span class="font-weight-medium">LinkedIn</span>
-                        </a>
-                        {% endif %}
-                        
-                        {% if user.konfigurasi.instagram %}
-                        <a href="{{ user.konfigurasi.instagram }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #52AAF4;">
-                            <i class="fab fa-instagram text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                            <span class="font-weight-medium">Instagram</span>
-                        </a>
-                        {% endif %}
-                        
-                        {% if user.konfigurasi.tiktok %}
-                        <a href="{{ user.konfigurasi.tiktok }}" class="d-block w-100 text-white text-decoration-none" style="background: #69C9D0;">
-                            <i class="fab fa-tiktok text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
-                            <span class="font-weight-medium">TikTok</span>
-                        </a>
+                        {% if user.konfigurasi.x or user.konfigurasi.facebook or user.konfigurasi.linkedin or user.konfigurasi.instagram or user.konfigurasi.tiktok %}
+                            {% if user.konfigurasi.x %}
+                            <a href="{{ user.konfigurasi.x }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #1DA1F2;">
+                                <i class="fab fa-twitter text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">Twitter</span>
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.konfigurasi.facebook %}
+                            <a href="{{ user.konfigurasi.facebook }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #39569E;">
+                                <i class="fab fa-facebook-f text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">Facebook</span>
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.konfigurasi.linkedin %}
+                            <a href="{{ user.konfigurasi.linkedin }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #0077B5;">
+                                <i class="fab fa-linkedin-in text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">LinkedIn</span>
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.konfigurasi.instagram %}
+                            <a href="{{ user.konfigurasi.instagram }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #52AAF4;">
+                                <i class="fab fa-instagram text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">Instagram</span>
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.konfigurasi.tiktok %}
+                            <a href="{{ user.konfigurasi.tiktok }}" class="d-block w-100 text-white text-decoration-none" style="background: #69C9D0;">
+                                <i class="fab fa-tiktok text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">TikTok</span>
+                            </a>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-center text-muted mb-0">Belum memiliki sosial media</p>
                         {% endif %}
                     </div>
+                    
                 </div>
                 <!-- Social Links End -->
             </div>

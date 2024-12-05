@@ -67,6 +67,10 @@
                                 <img src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="Default Profile Image" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
                             {% endif %}
                         </a>
+                        {% else %}
+                        <a href="{% url 'user:user_login' %}" class="nav-link text-body">
+                            <img src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" alt="Default Profile Image" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+                        </a>
                         {% endif %}
                     </li>
                 </ul>

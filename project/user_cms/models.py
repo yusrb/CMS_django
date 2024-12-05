@@ -36,16 +36,16 @@ class Konten(models.Model):
         return self.judul
 
 class Pertanyaan(models.Model):
-    community = models.ForeignKey('admin_cms.Komunitas' , on_delete=models.CASCADE)
+    komunitas = models.ForeignKey('admin_cms.Komunitas' , on_delete=models.CASCADE)
     judul = models.CharField(max_length=255)
-    isi = RichTextField()
+    isi = models.TextField()
     penulis = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
-    upvotes = models.IntegerField(default=0)
+    upvotes = models.IntegerField(default=0, null=True,blank=True)
 
     class Meta:
         verbose_name = "Pertanyaan"
-        verbose_name_plural = "Pertanyaan User"
+        verbose_name_plural = "Pertanyaan Komunitas"
 
     def __str__(self):
         return self.judul

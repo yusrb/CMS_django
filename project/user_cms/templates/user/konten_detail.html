@@ -120,11 +120,17 @@
                                     class="img-fluid rounded-full mr-3" style="width: 34px;">
                             </a>
                             <div>
-                                <h6>{{ komen.user.username }}</h6>
-                                <small><i>{{ komen.created_at|date:"d M Y" }}</i></small>
+                                <div class="flex items-center justify-between">
+                                    <h6 class="font-bold">{{ komen.user.username }}</h6>
+                                    <small class="text-gray-500 text-[12px] relative left-1">
+                                        <i>{{ komen.created_at|timesince }} ago</i>
+                                    </small>
+                                </div>
                                 <p>{{ komen.pesan }}</p>
                                 <button class="btn btn-sm btn-outline-secondary"
-                                    onclick="toggleReplyForm({{ komen.id }})">Reply</button>
+                                    onclick="toggleReplyForm({{ komen.id }})">
+                                    Reply
+                                </button>
 
                                 {% if komen.user.pk == request.user.pk %}
                                 <div class="dropdown d-inline-block">
@@ -202,7 +208,7 @@
                                                 {{ reply.user.username }}
                                     </a>
                                     <small>
-                                        <i>{{ reply.created_at|date:"d M Y" }}</i>
+                                        <i>{{ reply.created_at|timesince}}</i>
                                     </small>
                                     </h6>
                                     <p>{{ reply.pesan }}</p>

@@ -1,4 +1,9 @@
 import random
+from django.shortcuts import (
+    render,
+    redirect,
+)
+from django.contrib.auth.decorators import login_required
 from typing import Any
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DetailView , DeleteView
@@ -69,7 +74,7 @@ class UserLoginView(LoginView):
             # Default redirect jika level tidak dikenali
             return redirect('user:konten_list')
 
-class UserLogoutView(LogoutView):
+class UserLogoutView(LoginRequiredMixin, LogoutView):
     next_page = reverse_lazy('user:konten_list')
 
 class UserRegisterView(CreateView):
@@ -156,7 +161,7 @@ class UserProfilView(LoginRequiredMixin, DetailView):
         context['search_input'] = search_input
         return context
 
-class UserDetailView(LoginRequiredMixin, DetailView):
+class UserDetailView(DetailView):
     model = User
     template_name = 'user/user_detail.html'
     context_object_name = 'user'
@@ -190,10 +195,10 @@ class UserDetailView(LoginRequiredMixin, DetailView):
             )
 
         context["judul"] = 'Detail User'
-        context['top_posts_user'] = Konten.objects.filter(user=self.get_object().pk).order_by('-dilihat')[:5]
+        context['top_posts_user'] = Konten.objects.filter(user=self.get_object().pk).order_by('-dilihat')[:5].annotate(total_komentar=Count('komentar') + Count('komentar__replies'))
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5].annotate(total_komentar=Count('komentar') + Count('komentar__replies'))
         context["kategoris"] = Kategori.objects.all()
-        context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
+        # context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["design_user"] = get_object_or_404(User, pk=1)
         context["konfigurasi_home"] = Konfigurasi.objects.filter(user_id=1).first()
         return context
@@ -236,7 +241,7 @@ class KomunitasListView(ListView):
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
-        context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
+        # context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["design_user"] = get_object_or_404(User, pk=1)
         return context
 
@@ -247,28 +252,40 @@ class KomunitasDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["judul"] = self.get_object().nama
+        komunitas = self.get_object()  # Mengambil objek komunitas yang sedang dilihat
+        context["judul"] = komunitas.nama
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
-        context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["design_user"] = get_object_or_404(User, pk=1)
-        context['pertanyaan_list'] = self.get_object().get_pertanyaan_terkait().order_by('-created_at')
-        context["form"] = PertanyaanForm()
+        context['pertanyaan_list'] = komunitas.get_pertanyaan_terkait().order_by('-created_at')
+        context["form"] = PertanyaanForm()  # Form untuk membuat pertanyaan
         return context
 
-class PertanyaanCreateView(LoginRequiredMixin, CreateView):
-    model = Pertanyaan
-    form_class = PertanyaanForm
-    template_name = "create_pertanyaan.html"
+@login_required
+def PertanyaanCreateView(request, komunitas_id):
+    komunitas = get_object_or_404(Komunitas, id=komunitas_id)
 
-    def form_valid(self, form):
-        komunitas = get_object_or_404(Komunitas, id=self.kwargs['komunitas_id'])
-        form.instance.komunitas = komunitas
-        form.instance.penulis = self.request.user
-        form.save()
-        komunitas.update_pertanyaan_count()
-        return super().form_valid(form)
+    if request.method == 'POST':
+        form = PertanyaanForm(request.POST)
+        if form.is_valid():
+            pertanyaan = form.save(commit=False)
+            pertanyaan.komunitas = komunitas
+            pertanyaan.penulis = request.user
+            pertanyaan.save()
+            return redirect('user:komunitas_detail', pk=komunitas.id)
+        else:
+            print(form.errors)
+    else:
+        form = PertanyaanForm()
+
+    context = {
+        'form': form,
+        'komunitas': komunitas,
+        'pertanyaan_list': Pertanyaan.objects.filter(komunitas=komunitas),
+    }
+
+    return render(request, 'user/komunitas_detail.html', context)
 
 class ContactView(ListView):
     model = Konfigurasi
@@ -281,23 +298,23 @@ class ContactView(ListView):
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
-        context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
+        # context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["design_user"] = get_object_or_404(User, pk=1)
         return context
 
-class KontenListView(LoginRequiredMixin, ListView):
+class KontenListView(ListView):
     model = Konten
     template_name = 'user/konten_list.html'
     context_object_name = 'kontens'
     paginate_by = 6
 
-    def get(self, request, *args, **kwargs):
-        konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
+    # def get(self, request, *args, **kwargs):
+    #     konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
 
-        if not konfigurasi or not konfigurasi.alamat:
-            return redirect('user:konfigurasi')
+    #     if not konfigurasi or not konfigurasi.alamat:
+    #         return redirect('user:konfigurasi')
 
-        return super().get(request, *args, **kwargs)
+    #     return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -325,7 +342,7 @@ class KontenListView(LoginRequiredMixin, ListView):
             tanggal__lte=timezone.now()
         ).order_by('-tanggal')[:4].annotate(total_komentar=Count("komentar") + Count("komentar__replies"))
         context['top_posts'] = Konten.objects.order_by('-dilihat').annotate(total_komentar=Count("komentar"))[:5]
-        context['konfigurasis'] = Konfigurasi.objects.filter(user=self.request.user)
+        # context['konfigurasis'] = Konfigurasi.objects.filter(user=self.request.user)
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context['galeris'] = Galeri.objects.all()
         context['search_input'] = search_input
@@ -333,7 +350,7 @@ class KontenListView(LoginRequiredMixin, ListView):
 
         return context
 
-class KontenLatestListView(LoginRequiredMixin, ListView):
+class KontenLatestListView(ListView):
     model = Konten
     template_name = 'user/konten_latest.html'
     context_object_name = 'kontens'
@@ -372,7 +389,7 @@ class KontenLatestListView(LoginRequiredMixin, ListView):
         context['search_input'] = search_input
         return context
 
-class KontenTanggalListView(LoginRequiredMixin, ListView):
+class KontenTanggalListView(ListView):
     model = Konten
     template_name = 'user/konten_tanggal_list.html'
     context_object_name = 'kontens'
@@ -417,7 +434,7 @@ class KontenTanggalListView(LoginRequiredMixin, ListView):
 
         return context
 
-class KategoriListView(LoginRequiredMixin, ListView):
+class KategoriListView(ListView):
     model = Kategori
     template_name = 'user/kategori_list.html'
     context_object_name = 'kategoris'
@@ -458,18 +475,18 @@ class KategoriListView(LoginRequiredMixin, ListView):
 
         return context
 
-class KategoriDetailView(LoginRequiredMixin, DetailView):
+class KategoriDetailView(DetailView):
     model = Kategori
     template_name = 'user/kategori_detail.html'
     context_object_name = 'kategori'
 
-    def get(self, request, *args, **kwargs):
-        konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
+    # def get(self, request, *args, **kwargs):
+    #     konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
 
-        if not konfigurasi or not konfigurasi.alamat:
-            return redirect('user:konfigurasi')
+    #     if not konfigurasi or not konfigurasi.alamat:
+    #         return redirect('user:konfigurasi')
 
-        return super().get(request, *args, **kwargs)
+    #     return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -497,25 +514,26 @@ class KategoriDetailView(LoginRequiredMixin, DetailView):
         context['search_input'] = search_input
         return context
         
-class KontenDetailView(LoginRequiredMixin,DetailView):
+class KontenDetailView(DetailView):
     model = Konten
     template_name = 'user/konten_detail.html'
     context_object_name = 'konten'
 
     def get(self, request, *args, **kwargs):
-        konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
+        # konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
 
-        if not konfigurasi or not konfigurasi.alamat:
-            return redirect('user:konfigurasi')
+        # if not konfigurasi or not konfigurasi.alamat:
+        #     return redirect('user:konfigurasi')
 
         konten = self.get_object()
 
-        if not KontenDilihat.objects.filter(konten=konten, user=request.user).exists():
-            konten.dilihat += 1
-            konten.save()
+        if request.user.is_authenticated:  # Cek apakah user sudah login
+            if not KontenDilihat.objects.filter(konten=konten, user=request.user).exists():
+                konten.dilihat += 1
+                konten.save()
 
-            KontenDilihat.objects.create(konten=konten, user=request.user)
-        
+                KontenDilihat.objects.create(konten=konten, user=request.user)
+    
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -523,7 +541,7 @@ class KontenDetailView(LoginRequiredMixin,DetailView):
 
         komentar_queryset = Komen.objects.filter(konten=self.get_object())
         total_komentar = komentar_queryset.count()
-        total_balasan = Reply.objects.filter(komen__in=komentar_queryset).count()
+        total_balasan = Balasan.objects.filter(komen__in=komentar_queryset).count()
         total_komentar += total_balasan
 
         context["judul"] = self.get_object().judul
@@ -559,7 +577,7 @@ class ReplyKomenView(View):
         parent_komen = get_object_or_404(Komen, id=komen_id)
         konten = parent_komen.konten 
 
-        Reply.objects.create(
+        Balasan.objects.create(
             user=request.user,
             komen=parent_komen,
             nama=request.POST.get('nama'),
@@ -571,7 +589,7 @@ class ReplyKomenView(View):
 
 class ReplyUpdateView(View):
     def post(self, request, reply_id):
-        reply = get_object_or_404(Reply, pk=reply_id)
+        reply = get_object_or_404(Balasan, pk=reply_id)
         parent_komen = reply.komen
         konten = parent_komen.konten
 
@@ -585,7 +603,7 @@ class ReplyUpdateView(View):
 
 class ReplyDeleteView(View):
     def post(self, request, reply_id):
-        reply = get_object_or_404(Reply, pk=reply_id)
+        reply = get_object_or_404(Balasan, pk=reply_id)
         parent_komen = reply.komen
         konten = parent_komen.konten
 
@@ -614,7 +632,7 @@ class KomentarDeleteView(View):
         komen = get_object_or_404(Komen, pk=komen_id)
         konten = komen.konten
 
-        Reply.objects.filter(komen=komen).delete()
+        Balasan.objects.filter(komen=komen).delete()
 
         komen.delete()
 

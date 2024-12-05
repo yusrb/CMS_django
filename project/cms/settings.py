@@ -41,16 +41,21 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'tailwind',
     'theme',
+    "crispy_forms",
+    "crispy_bootstrap4",
     'admin_argon.apps.AdminArgonConfig',
     'django.contrib.admin',
     'django_browser_reload',
-    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]

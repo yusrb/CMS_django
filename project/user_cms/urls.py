@@ -43,7 +43,7 @@ urlpatterns = [
 
     path('komunitas/', KomunitasListView.as_view(), name="komunitas_list"),
     path('komunitas/<int:pk>/', KomunitasDetailView.as_view(), name='komunitas_detail'),
-    path('komunitas/<int:komunitas_id>/tanya/', PertanyaanCreateView.as_view(), name='create_pertanyaan'),
+    path('komunitas/<int:komunitas_id>/tanya/', PertanyaanCreateView, name='pertanyaan_komunitas_create'),
 
     path('' , KontenListView.as_view() , name="konten_list"),
     path('post/latest' , KontenLatestListView.as_view() , name="konten_latest"),
