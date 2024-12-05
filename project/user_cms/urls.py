@@ -3,6 +3,7 @@ from .views import (
     UserLoginView,
     UserRegisterView,
     UserLogoutView,
+
     UserProfilView,
     UserUpdateView,
     UserSosmedUpdate,

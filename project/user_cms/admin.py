@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group
 from django.utils.timezone import localtime
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
-from admin_cms.models import User, Aktivitas, Kategori, Konfigurasi, Galeri, Komunitas
+from admin_cms.models import User, Aktivitas, Kategori, Konfigurasi, Galeri, Komunitas, PeraturanKomunitas, Bookmarks
 from user_cms.models import Konten, Saran, Komen, Balasan, Pertanyaan
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
@@ -150,6 +150,16 @@ class KomunitasAdmin(admin.ModelAdmin):
         if obj is not None:
             return obj.user == request.user or request.user.is_superuser
         return True
+
+@admin.register(PeraturanKomunitas)
+class PeraturanKomunitasAdmin(admin.ModelAdmin):
+    list_display = ('komunitas','judul',)
+    list_filter = ('komunitas',)
+
+@admin.register(Bookmarks)
+class BookmarksAdmin(admin.ModelAdmin):
+    list_display = ('komunitas', 'judul', 'url_link')
+    list_filter = ('komunitas',)
 
 # Pertanyaan Admin
 @admin.register(Pertanyaan)

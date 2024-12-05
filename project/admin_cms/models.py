@@ -75,6 +75,30 @@ class Komunitas(models.Model):
     def __str__(self):
         return self.nama
 
+class PeraturanKomunitas(models.Model):
+    komunitas = models.ForeignKey(Komunitas, on_delete=models.CASCADE)
+    judul = models.CharField(max_length=60)
+    deskripsi = models.TextField()
+
+    class Meta:
+        verbose_name = "Peraturan Komunitas"
+        verbose_name_plural = "Peraturan Komunitas"
+
+    def __str__(self):
+        return f'{self.komunitas} - {self.judul}'
+
+class Bookmarks(models.Model):
+    komunitas = models.ForeignKey(Komunitas, on_delete=models.CASCADE)
+    judul = models.CharField(max_length=155)
+    url_link = models.URLField()
+
+    class Meta:
+        verbose_name = "Bookmark Komunitas"
+        verbose_name_plural = "Bookmark Komunitas"
+    
+    def __str__(self):
+        return f'{self.komunitas} - {self.judul}'
+
 class Aktivitas(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     aksi = models.CharField(max_length=255)

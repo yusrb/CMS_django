@@ -5,16 +5,31 @@ from django.shortcuts import (
 )
 from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.core.paginator import Paginator
 from urllib.parse import urlencode
 from typing import Any
 from django.views import View
-from django.views.generic import ListView, CreateView, UpdateView, DetailView , DeleteView
+from django.views.generic import (
+    ListView,
+    CreateView,
+    UpdateView,
+    DetailView,
+    DeleteView
+)
 from django.urls import reverse_lazy , reverse
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm , UserCreationForm
 from .forms import CustomUserCreationForm, ReplyForm
 from django.shortcuts import redirect , render , get_object_or_404
-from django.contrib.auth.views import LogoutView, LoginView
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView
+)
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils import timezone
@@ -28,6 +43,8 @@ from admin_cms.models import (
     Konfigurasi,
     KontenDilihat,
     Komunitas,
+    PeraturanKomunitas,
+    Bookmarks,
     )
 from user_cms.models import (
     Konten,
@@ -111,7 +128,7 @@ class UserRegisterView(CreateView):
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["judul"] = "Register Page" 
+        context["judul"] = "Register Page"
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         return context
 
@@ -234,8 +251,14 @@ class KomunitasListView(ListView):
     context_object_name = 'komunitas'
 
     def get_queryset(self):
-        return Komunitas.objects.filter(status=True)
-    
+        search_input = self.request.GET.get('q', '')
+
+        if search_input:
+            return Komunitas.objects.filter(
+                Q(nama__icontains=search_input) | Q(deskripsi__icontains=search_input), status=True
+            )
+        else:
+            return Komunitas.objects.filter(status=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -243,10 +266,12 @@ class KomunitasListView(ListView):
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
-        # context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["design_user"] = get_object_or_404(User, pk=1)
-        return context
 
+        search_input = self.request.GET.get('q', '')
+        context['search_input'] = search_input
+
+        return context
 class KomunitasDetailView(DetailView):
     model = Komunitas
     template_name = "user/Komunitas/komunitas_detail.html"
@@ -262,6 +287,20 @@ class KomunitasDetailView(DetailView):
         context["design_user"] = get_object_or_404(User, pk=1)
         context['pertanyaan_list'] = komunitas.get_pertanyaan_terkait().order_by('-created_at')
         context["form"] = PertanyaanForm()
+        context['peraturans'] = PeraturanKomunitas.objects.filter(komunitas = self.get_object().id)
+        context['bookmarks'] = Bookmarks.objects.filter(komunitas = self.get_object().id)
+
+        if self.request.user.is_authenticated:
+            cache_key = f'komunitas_{komunitas.id}_users_online'
+            users_online = cache.get(cache_key, [])
+            if self.request.user.id not in users_online:
+                users_online.append(self.request.user.id)
+                cache.set(cache_key, users_online, timeout=60 * 5)
+
+        # Mendapatkan jumlah pengguna yang sedang online
+        users_online_count = len(cache.get(f'komunitas_{komunitas.id}_users_online', []))
+        context["users_online"] = users_online_count
+
         return context
 
 @login_required
@@ -397,41 +436,47 @@ class KontenLatestListView(ListView):
     model = Konten
     template_name = 'user/konten_latest.html'
     context_object_name = 'kontens'
+    paginate_by = 6
 
     def get(self, request, *args, **kwargs):
         if not hasattr(request.user, 'konfigurasi'):
             return redirect('user:konfigurasi')
         return super().get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_theme_config = User.objects.filter(username=self.request.user.username).first()
-        
+
         if user_theme_config:
             context['theme'] = user_theme_config.theme
 
         search_input = self.request.GET.get('q')
-
+        
         if search_input:
-            context['kontens'] = Konten.objects.filter(
-                judul__icontains=search_input
-            ).annotate(
+            kontens = Konten.objects.filter(judul__icontains=search_input).annotate(
                 total_komentar=Count('komentar') + Count('komentar__replies')
             ).distinct()
         else:
-            context['kontens'] = Konten.objects.order_by('-tanggal').annotate(
+            kontens = Konten.objects.all().annotate(
                 total_komentar=Count('komentar') + Count('komentar__replies')
             )
 
+        # Paginasi
+        paginator = Paginator(kontens, self.paginate_by)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context['kontens'] = page_obj
+        context['page_obj'] = page_obj
         context["judul"] = 'Daftar Konten Latest'
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context["kategoris"] = Kategori.objects.all()
         context["konfigurasis"] = Konfigurasi.objects.filter(user=self.request.user)
         context["konfigurasi_home"] = Konfigurasi.objects.filter(user_id=1).first()
-        context["design_user"] = get_object_or_404(User, pk=1)
-        context['search_input'] = search_input
-        return context
+        context["design_user"] = get_object_or_404(User, username=self.request.user.username)
 
+        return context
+        
 class KontenTanggalListView(ListView):
     model = Konten
     template_name = 'user/konten_tanggal_list.html'

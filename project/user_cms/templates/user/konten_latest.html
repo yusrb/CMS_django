@@ -19,7 +19,7 @@
                     <div class="row">
                         {% for konten in kontens|slice:":10" %}
                         <div class="col-lg-6" style="height: 500px;" data-aos="fade-up" data-aos-duration="1500">
-                            <div class="position-relative mb-10">
+                            <div class="position-relative mb-7">
                                 <img class="img-fluid w-100" src="{{ konten.foto.url }}" style="object-fit: cover; height: 280px;">
                                 <div class="bg-white border border-top-0 p-4">
                                     <div class="mb-2">
@@ -63,6 +63,41 @@
                             </div>
                         </div>
                         {% endfor %}
+                    </div>
+                    <div id="pagination-container" data-aos="zoom-in" data-aos-duration="3000">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_input %}&q={{ search_input }}{% endif %}#konten-list" aria-label="Previous"
+                                        onclick="scrollToPagination(event)">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+        
+                                {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                                {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if search_input %}&q={{ search_input }}{% endif %}#konten-list" onclick="scrollToPagination(event)">{{ num }}</a>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+        
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_input %}&q={{ search_input }}{% endif %}#konten-list" aria-label="Next"
+                                        onclick="scrollToPagination(event)">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
                     </div>
                 </div>
                 <!-- Konten Kategori Detail End -->
