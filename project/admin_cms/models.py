@@ -37,7 +37,7 @@ class User(AbstractUser):
         else:
             self.is_superuser = False
             self.is_staff = True
-            
+
         super(User, self).save(*args, **kwargs)
 
         if self.level == 'User':
@@ -53,6 +53,7 @@ class User(AbstractUser):
                 self.user_permissions.add(permission)
 
 class Komunitas(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default=1)
     nama = models.CharField(max_length=30)
     deskripsi = models.TextField()
     foto_komunitas = models.ImageField(upload_to="komunitas_foto/", blank=True, null=True)

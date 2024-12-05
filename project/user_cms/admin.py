@@ -57,7 +57,7 @@ class KontenAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change:
-            obj.user = request.user 
+            obj.user = request.user
             obj.username = request.user.username
         super().save_model(request, obj, form, change)
 
@@ -116,28 +116,40 @@ class KonfigurasiAdmin(admin.ModelAdmin):
 
 # Komunitas Admin
 class KomunitasAdmin(admin.ModelAdmin):
-    list_display = ('nama', 'status', 'jumlah_pertanyaan', 'tanggal')
-    # list_filter = ('status',)
+    list_display = ('nama', 'status', 'jumlah_pertanyaan', 'tanggal', 'user')
     search_fields = ('nama',)
     readonly_fields = ['jumlah_pertanyaan']
     ordering = ('-tanggal',)
-
-    def save_model(self, request, obj, form, change):
-        if not obj.jumlah_pertanyaan:
-            obj.jumlah_pertanyaan = 0
-            
-        obj.save()
-
-        if hasattr(obj, 'update_pertanyaan_count'):
-            obj.update_pertanyaan_count()
-
-        super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
-        return qs.filter(status=True)
+        return qs.filter(user=request.user)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.user = request.user 
+            obj.username = request.user.username
+        super().save_model(request, obj, form, change)
+
+    def has_add_permission(self, request):
+        return request.user.is_authenticated
+
+    def has_change_permission(self, request, obj=None):
+        if obj is not None:
+            return obj.user == request.user or request.user.is_superuser
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is not None:
+            return obj.user == request.user or request.user.is_superuser
+        return True
+
+    def has_view_permission(self, request, obj=None):
+        if obj is not None:
+            return obj.user == request.user or request.user.is_superuser
+        return True
 
 # Pertanyaan Admin
 @admin.register(Pertanyaan)

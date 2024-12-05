@@ -3,7 +3,9 @@ from django.shortcuts import (
     render,
     redirect,
 )
+from django.http import HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
+from urllib.parse import urlencode
 from typing import Any
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DetailView , DeleteView
@@ -252,14 +254,14 @@ class KomunitasDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        komunitas = self.get_object()  # Mengambil objek komunitas yang sedang dilihat
+        komunitas = self.get_object()
         context["judul"] = komunitas.nama
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
         context["design_user"] = get_object_or_404(User, pk=1)
         context['pertanyaan_list'] = komunitas.get_pertanyaan_terkait().order_by('-created_at')
-        context["form"] = PertanyaanForm()  # Form untuk membuat pertanyaan
+        context["form"] = PertanyaanForm()
         return context
 
 @login_required
@@ -273,7 +275,11 @@ def PertanyaanCreateView(request, komunitas_id):
             pertanyaan.komunitas = komunitas
             pertanyaan.penulis = request.user
             pertanyaan.save()
-            return redirect('user:komunitas_detail', pk=komunitas.id)
+
+            url = reverse('user:komunitas_detail', kwargs={'pk': komunitas.id})
+            query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
+            return redirect(f"{url}?{query_params}")
+
         else:
             print(form.errors)
     else:
@@ -286,6 +292,43 @@ def PertanyaanCreateView(request, komunitas_id):
     }
 
     return render(request, 'user/komunitas_detail.html', context)
+
+@login_required
+def PertanyaanDeleteView(request, pertanyaan_id):
+    pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
+
+    if pertanyaan.penulis != request.user:
+        return HttpResponseForbidden("Anda tidak memiliki izin untuk menghapus pertanyaan ini.")
+
+    pertanyaan.delete()
+    url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
+    query_params = urlencode({'scroll_to': 'pertanyaan-list'})
+    return redirect(f"{url}?{query_params}")
+
+@login_required
+def PertanyaanUpdateView(request, pertanyaan_id):
+    pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
+
+    if pertanyaan.penulis != request.user:
+        return HttpResponseForbidden("Anda tidak memiliki izin untuk mengedit pertanyaan ini.")
+
+    if request.method == 'POST':
+        form = PertanyaanForm(request.POST, instance=pertanyaan)
+        if form.is_valid():
+            form.save()
+            url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
+            query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
+            return redirect(f"{url}?{query_params}")
+    else:
+        form = PertanyaanForm(instance=pertanyaan)
+
+    context = {
+        'form': form,
+        'pertanyaan': pertanyaan,
+        'komunitas': pertanyaan.komunitas,
+    }
+
+    return render(request, 'user/Komunitas/komunitas_detail.html', context)
 
 class ContactView(ListView):
     model = Konfigurasi
@@ -527,7 +570,7 @@ class KontenDetailView(DetailView):
 
         konten = self.get_object()
 
-        if request.user.is_authenticated:  # Cek apakah user sudah login
+        if request.user.is_authenticated:
             if not KontenDilihat.objects.filter(konten=konten, user=request.user).exists():
                 konten.dilihat += 1
                 konten.save()
