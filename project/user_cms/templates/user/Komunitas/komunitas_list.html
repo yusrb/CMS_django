@@ -1,0 +1,76 @@
+{% include 'base.html' %}
+{% load static %}
+{% include 'snippets/nav.html' %}
+
+{% block content %}
+<div class="container-fluid mt-5 pt-3">
+    <div class="container">
+        <div class="row">
+            <!-- Komunitas List Start -->
+            <div class="w-[66.6%]">
+                <div class="section-title mb-3 text-center">
+                    <h4 class="m-0 text-uppercase font-weight-bold ">Komunitas Musik</h4>
+                </div>
+
+                <div class="row">
+                    {% for komunitas in komunitass %}
+                    <div class="col-lg-12 mb-4" data-aos="fade-up" data-aos-duration="1500">
+                        <div class="card shadow-xl border-2 border-gray-300 rounded-lg overflow-hidden transform transition-all duration-300">
+                            {% if komunitas.foto_komunitas and komunitas.foto_komunitas.url %}
+                                <img src="{{ komunitas.foto_komunitas.url }}" class="card-img-top" alt="Komunitas Image" style="height: 350px; object-fit: cover;">
+                            {% else %}
+                                <img src="data:image/png;base64,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" class="card-img-top" alt="Komunitas Image" style="height: 350px; object-fit: cover;">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title font-weight-bold">{{ komunitas.nama }}</h5>
+                                <p class="card-text text-muted">{{ komunitas.deskripsi|truncatewords:21 }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <a href="{% url 'user:komunitas_detail' komunitas.pk %}" class="btn btn-outline-primary btn-sm">Detail Komunitas</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p class="ml-4">Komunitas tidak ditemukan</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Komunitas List End -->
+            {% include 'snippets/sidebar.html' %}
+        </div>
+    </div>
+</div>
+
+{% include 'snippets/footer.html' %}
+
+<a href="#" class="btn btn-primary btn-square back-to-top">
+    <i class="fa fa-arrow-up"></i>
+</a>
+
+<script>
+  function scrollToElementById(id) {
+      const element = document.getElementById(id);
+      if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+      }
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const scrollTo = urlParams.get('scroll_to');
+  if (scrollTo) {
+      scrollToElementById(scrollTo);
+  }
+</script>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'lib/easing/easing.min.js' %}"></script>
+<script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+<!-- Template Javascript -->
+<script src="{% static 'js/main.js' %}"></script>
+
+{% endblock content %}
