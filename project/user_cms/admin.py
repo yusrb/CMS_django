@@ -4,7 +4,7 @@ from django.utils.timezone import localtime
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from admin_cms.models import User, Aktivitas, Kategori, Konfigurasi, Galeri, Komunitas, PeraturanKomunitas, Bookmarks
-from user_cms.models import Konten, Saran, Komen, Balasan, Pertanyaan
+from user_cms.models import Konten, Saran, Komen, Balasan, Pertanyaan, Jawaban
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 # UserAdmin
@@ -181,4 +181,5 @@ admin.site.register(Balasan)
 admin.site.register(Konten, KontenAdmin)
 admin.site.register(Konfigurasi, KonfigurasiAdmin)
 admin.site.register(Galeri)
+admin.site.register(Jawaban)
 admin.site.unregister(Group)

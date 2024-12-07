@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from admin_cms.models import User, Konfigurasi
-from user_cms.models import Komen , Balasan, Pertanyaan
+from user_cms.models import Komen , Balasan, Pertanyaan, Jawaban
 from .models import Saran
 
 class UserRegisterForm(UserCreationForm):
@@ -91,3 +91,8 @@ class PertanyaanForm(forms.ModelForm):
     class Meta:
         model = Pertanyaan
         fields = ['judul', 'isi',]
+
+class JawabanForm(forms.ModelForm):
+    class Meta:
+        model = Jawaban
+        fields = ['isi']

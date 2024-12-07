@@ -50,6 +50,19 @@ class Pertanyaan(models.Model):
     def __str__(self):
         return self.judul
 
+class Jawaban(models.Model):
+    pertanyaan = models.ForeignKey(Pertanyaan, related_name='jawaban_set', on_delete=models.CASCADE)
+    isi = models.TextField()
+    penulis = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Jawaban Pertanyaan"
+        verbose_name_plural = "Jawaban Pertanyaan"
+
+    def __str__(self):
+        return f'Jawaban {self.penulis} - {self.pertanyaan.judul} - {self.isi}'
+
 class Saran(models.Model):
     isi_saran = models.TextField()
     tanggal = models.DateTimeField(auto_now_add = True)

@@ -3,7 +3,7 @@ from django.shortcuts import (
     render,
     redirect,
 )
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.paginator import Paginator
@@ -34,7 +34,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils import timezone
 from django.core.mail import send_mail
-from .models import Saran
 from django.db.models import Q, Count
 from admin_cms.models import (
     User,
@@ -47,10 +46,12 @@ from admin_cms.models import (
     Bookmarks,
     )
 from user_cms.models import (
+    Saran,
     Konten,
     Komen,
     Balasan,
     Pertanyaan,
+    Jawaban,
 )
 from .forms import (
     LevelChoiceForm,
@@ -58,6 +59,7 @@ from .forms import (
     KonfigurasiForm,
     KomenForm,
     PertanyaanForm,
+    JawabanForm,
     )
 
 class UserLoginView(LoginView):
@@ -65,7 +67,7 @@ class UserLoginView(LoginView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect(self.get_redirect_url(request.user))
+            return redirect('user:konten_list')
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -75,22 +77,16 @@ class UserLoginView(LoginView):
         return context
 
     def form_valid(self, form):
-        # Ambil user dari form
         user = form.get_user()
 
-        # Login user
         login(self.request, user)
-
-        # Simpan level user ke session
         self.request.session['level'] = user.level
 
-        # Redirect sesuai level user
         if user.level == 'admin':
             return redirect('user:konfigurasi')
         elif user.level == 'user':
             return redirect('user:konten_list')
         else:
-            # Default redirect jika level tidak dikenali
             return redirect('user:konten_list')
 
 class UserLogoutView(LoginRequiredMixin, LogoutView):
@@ -103,7 +99,7 @@ class UserRegisterView(CreateView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect(self.get_success_url())
+            return redirect('user:konten_list')
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -298,32 +294,34 @@ class KomunitasDetailView(DetailView):
                 users_online.append(self.request.user.id)
                 cache.set(cache_key, users_online, timeout=60 * 5)
 
-        # Mendapatkan jumlah pengguna yang sedang online
         users_online_count = len(cache.get(f'komunitas_{komunitas.id}_users_online', []))
         context["users_online"] = users_online_count
 
         return context
 
-@login_required
 def PertanyaanCreateView(request, komunitas_id):
     komunitas = get_object_or_404(Komunitas, id=komunitas_id)
 
-    if request.method == 'POST':
-        form = PertanyaanForm(request.POST)
-        if form.is_valid():
-            pertanyaan = form.save(commit=False)
-            pertanyaan.komunitas = komunitas
-            pertanyaan.penulis = request.user
-            pertanyaan.save()
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = PertanyaanForm(request.POST)
+            if form.is_valid():
+                pertanyaan = form.save(commit=False)
+                pertanyaan.komunitas = komunitas
+                pertanyaan.penulis = request.user
+                pertanyaan.save()
 
-            url = reverse('user:komunitas_detail', kwargs={'pk': komunitas.id})
-            query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
-            return redirect(f"{url}?{query_params}")
+                url = reverse('user:komunitas_detail', kwargs={'pk': komunitas.id})
+                query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
+                return redirect(f"{url}?{query_params}")
 
+            else:
+                print(form.errors)
         else:
-            print(form.errors)
+            form = PertanyaanForm()
     else:
-        form = PertanyaanForm()
+        messages.error(request, 'Anda harus login terlebih dahulu untuk membuat Pertanyaan di Komunitas')
+        return redirect('user:user_login')
 
     context = {
         'form': form,
@@ -369,6 +367,74 @@ def PertanyaanUpdateView(request, pertanyaan_id):
     }
 
     return render(request, 'user/Komunitas/komunitas_detail.html', context)
+
+def JawabanPertanyaanCreateView(request, pertanyaan_id):
+    pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
+
+    if request.user.is_authenticated:
+        if request.method == "POST":
+            jawaban_isi = request.POST.get('isi')
+
+            penulis = request.user
+
+            jawaban = pertanyaan.jawaban_set.create(isi=jawaban_isi, penulis=penulis)
+
+            url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
+            query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
+
+            full_url = f'{url}?{query_params}'
+
+            return redirect(full_url)
+    else:
+        messages.error(request, 'Anda harus login terlebih dahulu untuk membuat jawaban')
+        return redirect('user:user_login')
+
+    return render(request, 'user_cms/jawab_pertanyaan.html', {'pertanyaan': pertanyaan})
+
+def JawabanPertanyaanDeleteView(request, pertanyaan_id, jawaban_id):
+    pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
+    jawaban = get_object_or_404(Jawaban, id=jawaban_id, pertanyaan=pertanyaan)
+
+    if jawaban.penulis == request.user:
+            jawaban.delete()
+
+    url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
+    query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
+    full_url = f'{url}?{query_params}'
+    return redirect(full_url)
+
+def JawabanPertanyaanUpdateView(request, pertanyaan_id):
+    pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
+
+    if request.method == "POST":
+        jawaban.delete()
+
+        url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
+        query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
+
+        full_url = f'{url}?{query_params}'
+
+        return redirect(full_url)
+
+    return render(request, 'user_cms/jawab_pertanyaan.html', {'pertanyaan': pertanyaan})
+
+def JawabanPertanyaanUpdateView(request, pertanyaan_id, jawaban_id):
+    pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
+    jawaban = get_object_or_404(Jawaban, id=jawaban_id, pertanyaan=pertanyaan)
+
+    if request.method == 'POST':
+        jawaban_isi = request.POST.get('isi')
+        jawaban.isi = jawaban_isi
+        jawaban.save()
+
+        url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
+        query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
+
+        full_url = f'{url}?{query_params}'
+
+        return redirect(full_url)
+
+    return render(request, 'user/update_jawaban.html', {'jawaban': jawaban, 'pertanyaan': pertanyaan})
 
 class ContactView(ListView):
     model = Konfigurasi
@@ -439,11 +505,6 @@ class KontenLatestListView(ListView):
     context_object_name = 'kontens'
     paginate_by = 6
 
-    def get(self, request, *args, **kwargs):
-        if not hasattr(request.user, 'konfigurasi'):
-            return redirect('user:konfigurasi')
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_theme_config = User.objects.filter(username=self.request.user.username).first()
@@ -482,11 +543,6 @@ class KontenTanggalListView(ListView):
     model = Konten
     template_name = 'user/konten_tanggal_list.html'
     context_object_name = 'kontens'
-
-    def get(self, request, *args, **kwargs):
-        if not hasattr(request.user, 'konfigurasi'):
-            return redirect('user:konfigurasi')
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -528,11 +584,6 @@ class KategoriListView(ListView):
     template_name = 'user/kategori_list.html'
     context_object_name = 'kategoris'
 
-    def get(self, request, *args, **kwargs):
-        if not hasattr(request.user, 'konfigurasi'):
-            return redirect('user:konfigurasi')
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
 
@@ -557,7 +608,6 @@ class KategoriListView(ListView):
 
         context["judul"] = 'Daftar Kategori'
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
-        context["konfigurasis"] = Konfigurasi.objects.filter(user=self.request.user)
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["design_user"] = get_object_or_404(User, pk=1)
         context['search_input'] = search_input
@@ -599,7 +649,6 @@ class KategoriDetailView(DetailView):
         context["kategoris"] = Kategori.objects.all()
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["design_user"] = get_object_or_404(User, pk=1)
-        context["konfigurasis"] = Konfigurasi.objects.filter(user=self.request.user)
         context['search_input'] = search_input
         return context
         
@@ -649,22 +698,26 @@ class KontenDetailView(DetailView):
         return context
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = KomenForm(request.POST)
+        if request.user.is_authenticated:
+            self.object = self.get_object()
+            form = KomenForm(request.POST)
 
-        if form.is_valid():
-            komen = form.save(commit=False)
-            komen.konten = self.object
-            komen.user = request.user
-            komen.save()
-            return redirect('user:konten_detail', slug=self.object.slug)
+            if form.is_valid():
+                komen = form.save(commit=False)
+                komen.konten = self.object
+                komen.user = request.user
+                komen.save()
+                return redirect('user:konten_detail', slug=self.object.slug)
+        else:
+            messages.error(request, 'Anda harus login untuk memberikan komentar.')
+            return redirect('user:user_login')
 
         return self.get(request, *args, **kwargs)
 
-class ReplyKomenView(View):
+class ReplyKomenView(LoginRequiredMixin, View):
     def post(self, request, komen_id):
         parent_komen = get_object_or_404(Komen, id=komen_id)
-        konten = parent_komen.konten 
+        konten = parent_komen.konten
 
         Balasan.objects.create(
             user=request.user,
@@ -798,7 +851,7 @@ class KonfigurasiUpdateView(UpdateView):
     template_name = 'user/konfigurasi.html'
 
     def get(self, request, *args, **kwargs):
-        konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
+        konfigurasi = Konfigurasi.objects.filter(user=request.user).first()
 
         if konfigurasi and konfigurasi.alamat:
             return redirect('user:konten_list')
