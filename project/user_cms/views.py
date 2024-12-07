@@ -266,6 +266,7 @@ class KomunitasListView(ListView):
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
+        context["komunitass"] = Komunitas.objects.all()
         context["design_user"] = get_object_or_404(User, pk=1)
 
         search_input = self.request.GET.get('q', '')
