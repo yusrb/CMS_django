@@ -12,15 +12,13 @@ class UserLevelMiddleware:
 
         return response
 
+# user_cms/middleware.py
 class ThemeMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.user.is_authenticated:
-            request.theme = request.user.theme
-        else:
-            request.theme = None
-        
+        # Logika middleware di sini
         response = self.get_response(request)
         return response
+

@@ -3,7 +3,6 @@ from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 from admin_cms.models import User, Aktivitas
 from user_cms.models import Konten
-from admin_interface.models import Theme
 
 @receiver(post_save, sender=Konten)
 def log_konten_save(sender, instance, created, **kwargs):

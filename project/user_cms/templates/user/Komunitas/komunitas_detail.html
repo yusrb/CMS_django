@@ -281,24 +281,56 @@
                         <hr class="relative">
 
                         {% if user in komunitas.members.all %}
-                        <button class="btn btn-gray-500 w-full text-sm font-semibold mt-4" disabled>Anda Sudah
+                        <button class="btn btn-yellow-500 w-full text-sm font-semibold mt-4" disabled>Anda Sudah
                             Bergabung</button>
+                        <button class="px-3 py-3 rounded text-white bg-red-500 w-full text-sm font-semibold mt-1" data-bs-toggle="modal"
+                            data-bs-target="#confirmLeaveModal">
+                            Keluar dari Komunitas
+                        </button>
+
+                        <!-- Modal Confirm Keluar -->
+                        <div class="modal fade" id="confirmLeaveModal" tabindex="-1"
+                            aria-labelledby="confirmLeaveModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-warning">
+                                        <h5 class="modal-title" id="confirmLeaveModalLabel">Konfirmasi Keluar</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Apakah Anda yakin ingin keluar dari komunitas {{ komunitas.nama }}?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Batal</button>
+                                        <form method="post" action="{% url 'user:komunitas_keluar' komunitas.pk %}"
+                                            class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Ya, Keluar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {% else %}
                         <form method="post" action="{% url 'user:komunitas_join' komunitas.pk %}" class="mt-4">
                             {% csrf_token %}
                             <button type="submit"
-                                class="px-3 py-3 relative bottom-1 bg-gradient-to-br from-[#A4A4A4] to-[#B0B0B0] w-full rounded-md text-sm text-white font-semibold transition-all duration-300 hover:from-[#8A8A8A] hover:to-[#D0D0D0] focus:outline-none focus:ring-2 focus:ring-[#707070] shadow-2xl hover:shadow-2xl border-2 border-[#B0B0B0] hover:border-[#A0A0A0]">
+                                class="px-3 py-3 relative bottom-1 bg-gradient-to-br from-[#FBC02D] to-[#FF9800] w-full rounded-md text-sm text-white font-semibold transition-all duration-300 hover:from-[#FFEB3B] hover:to-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FF7043] shadow-2xl hover:shadow-2xl">
                                 Bergabung dengan Komunitas
                             </button>
                         </form>
                         {% endif %}
-                    </div>
-                </div>
 
-                <div class="card mt-6">
-                    <div class="card-header bg-warning text-white">
-                        <h5 class="font-semibold text-xl relative top-1">Bookmarks Komunitas</h5>
                     </div>
+                    </div>
+
+                    <div class="card mt-6">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="font-semibold text-xl relative top-1">Bookmarks Komunitas</h5>
+                        </div>
                     <div class="card-body">
                         <ul class="space-y-2">
                             {% for bookmark in bookmarks %}

@@ -24,10 +24,6 @@ from .forms import CustomUserCreationForm, ReplyForm
 from django.contrib.auth.views import (
     LoginView,
     LogoutView,
-    PasswordResetView,
-    PasswordResetDoneView,
-    PasswordResetConfirmView,
-    PasswordResetCompleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -84,9 +80,9 @@ class UserLoginView(LoginView):
         if user.level == 'admin':
             return redirect('user:konfigurasi')
         elif user.level == 'user':
-            return redirect('user:konten_list')
+            return redirect('user:konfigurasi')
         else:
-            return redirect('user:konten_list')
+            return redirect('user:konfigurasi')
 
 class UserLogoutView(LoginRequiredMixin, LogoutView):
     next_page = reverse_lazy('user:konten_list')
@@ -138,15 +134,6 @@ class UserProfilView(LoginRequiredMixin, DetailView):
     template_name = 'user/user_profil.html'
     context_object_name = 'user'
 
-    def get(self, request, *args, **kwargs):
-        konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
-
-        if not konfigurasi or not konfigurasi.alamat:
-            return redirect('user:konfigurasi')
-
-        return super().get(request, *args, **kwargs)
-
-
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
@@ -169,7 +156,7 @@ class UserProfilView(LoginRequiredMixin, DetailView):
         context["judul"] = 'Profil User'
         context['top_posts'] = Konten.objects.filter(user=self.get_object().pk).order_by('-dilihat')[:5].annotate(total_komentar=Count('komentar') + Count('komentar__replies'))
         context["kategoris"] = Kategori.objects.all()
-        context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
+        context["konfigurasi"] = Konfigurasi.objects.filter(user = self.request.user)
         context["konfigurasi_home"] = Konfigurasi.objects.filter(user_id=1).first()
         context["design_user"] = get_object_or_404(User, pk=1)
         context['search_input'] = search_input
@@ -225,7 +212,14 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         return reverse_lazy('user:user_profil', kwargs={'pk': self.object.pk})
 
     def form_valid(self, form):
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        konfigurasi = get_object_or_404(Konfigurasi, user=self.request.user)
+        konfigurasi.alamat = self.request.POST.get('alamat', konfigurasi.alamat)
+
+        konfigurasi.save()
+
+        return response
 
 class UserSosmedUpdate(View):
     def post(self, request, pk):
@@ -236,6 +230,7 @@ class UserSosmedUpdate(View):
         konfigurasi.x = request.POST.get('x', konfigurasi.x)
         konfigurasi.linkedin = request.POST.get('linkedin', konfigurasi.linkedin)
         konfigurasi.tiktok = request.POST.get('tiktok', konfigurasi.tiktok)
+        konfigurasi.alamat = request.POST.get('alamat', konfigurasi.alamat)
 
         konfigurasi.save()
         return redirect('user:user_profil', pk=request.user.pk)
@@ -310,7 +305,19 @@ def KomunitasJoinView(request, pk):
         return redirect('user:komunitas_detail', pk=komunitas.pk)
 
     komunitas.members.add(request.user)
-    messages.success(request, f"Anda berhasil bergabung dengan komunitas {komunitas.nama}.")
+    messages.success(request, f"Anda berhasil bergabung dengan komunitas {komunitas.nama}. 🎉🎉")
+
+    return redirect('user:komunitas_detail', pk=komunitas.pk)
+
+def KomunitasKeluarView(request, pk):
+    komunitas = get_object_or_404(Komunitas, pk=pk)
+
+    if request.user in komunitas.members.all():
+        komunitas.members.remove(request.user)
+
+        messages.success(request, f"Anda berhasil keluar dari komunitas {komunitas.nama}.")
+    else:
+        messages.error(request, "Anda tidak terdaftar dalam komunitas ini.")
 
     return redirect('user:komunitas_detail', pk=komunitas.pk)
 

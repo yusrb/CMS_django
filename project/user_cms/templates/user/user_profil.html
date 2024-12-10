@@ -26,14 +26,23 @@
                             <input type="file" name="foto" class="mt-2" onchange="previewImage(event)">
                             <input type="text" name="nama" class="form-control mt-2" placeholder="Nama" value="{{ user.nama }}">
                             <input type="email" name="email" class="form-control mt-2" placeholder="Email" value="{{ user.email }}" required>
-                            <input type="text" name="telepon" class="form-control mt-2"  required placeholder="Telepon" value="{{ user.telepon }}">
-                            {% if user.about %}
-                            <textarea class="form-control mt-2" name="about" placeholder="About" rows="4">{{ user.about }}</textarea>
+                            <input type="text" name="telepon" class="form-control mt-2" required placeholder="Telepon" value="{{ user.telepon }}">
+                        
+                            {% if user.konfigurasi.alamat %}
+                                <input type="text" name="alamat" class="form-control mt-2" placeholder="Alamat" value="{{ user.konfigurasi.alamat }}">
                             {% else %}
-                            <textarea class="form-control mt-2" name="about" placeholder="Masukkan Bio..." rows="4"></textarea>
+                                <input type="text" name="alamat" class="form-control mt-2" placeholder="Alamat">
                             {% endif %}
+                        
+                            {% if user.about %}
+                                <textarea class="form-control mt-2" name="about" placeholder="About" rows="4">{{ user.about }}</textarea>
+                            {% else %}
+                                <textarea class="form-control mt-2" name="about" placeholder="Masukkan Bio..." rows="4"></textarea>
+                            {% endif %}
+                        
                             <button type="submit" class="btn btn-primary mt-2">Simpan Perubahan</button>
                         </form>
+                        
                     </div>
                 </div>
 

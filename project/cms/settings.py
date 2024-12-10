@@ -32,17 +32,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'admin_cms',
     'user_cms',
-    'admin_interface',
-    'django_extensions',
-    'colorfield',
     'ckeditor',
     'ckeditor_uploader',
     'tailwind',
     'theme',
     "crispy_forms",
     "crispy_bootstrap4",
+    'admin_cms',
     'admin_argon.apps.AdminArgonConfig',
     'django.contrib.admin',
     'django_browser_reload',
@@ -56,9 +53,6 @@ INSTALLED_APPS = [
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
-
-X_FRAME_OPTIONS = "SAMEORIGIN"
-SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 TAILWIND_APP_NAME = 'theme'
 
@@ -115,7 +109,7 @@ WSGI_APPLICATION = 'cms.wsgi.application'
 AUTH_USER_MODEL = 'admin_cms.User'
 
 LOGIN_URL = 'user:user_login'
-LOGIN_REDIRECT_URL = 'user:konten_list'
+# LOGIN_REDIRECT_URL = 'user:konten_list'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

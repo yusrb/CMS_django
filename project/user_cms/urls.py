@@ -12,6 +12,7 @@ from .views import (
     KomunitasListView,
     KomunitasDetailView,
     KomunitasJoinView,
+    KomunitasKeluarView,
 
     PertanyaanCreateView,
     PertanyaanDeleteView,
@@ -53,6 +54,7 @@ urlpatterns = [
     path('komunitas/', KomunitasListView.as_view(), name="komunitas_list"),
     path('komunitas/<int:pk>/', KomunitasDetailView.as_view(), name='komunitas_detail'),
     path('komunitas/join/<int:pk>', KomunitasJoinView, name='komunitas_join'),
+    path('komunitas/keluar/<int:pk>', KomunitasKeluarView, name="komunitas_keluar"),
 
     path('komunitas/<int:komunitas_id>/tanya/', PertanyaanCreateView, name='pertanyaan_komunitas_create'),
     path('pertanyaan/<int:pertanyaan_id>/edit/', PertanyaanUpdateView, name='pertanyaan_komunitas_update'),

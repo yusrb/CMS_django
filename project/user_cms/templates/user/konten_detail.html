@@ -23,7 +23,7 @@
         <div class="row align-items-center">
             <div class="col-12">
                 <div class="d-flex align-items-center justify-content-start">
-                    <!-- Judul Another Contens-->
+                    <!-- Judul Konten Lain-->
                     <div class="section-title border-right-0 mb-0" style="flex: 0 0 158px;">
                         <h4 class="ml-1 m-0 text-uppercase font-weight-bold border-r-2" style="font-size: 18px;">Another Contents
                         </h4>
@@ -61,7 +61,7 @@
                                 href="{% url 'user:kategori_detail' konten.kategori.pk %}">{{konten.kategori}}</a>
                             <a class="text-body" href="{% url 'user:konten_tanggal_list' %}">{{konten.tanggal}}</a>
                         </div>
-                        <h1 class="mb-3 text-secondary text-uppercase font-weight-bold">{{konten.judul}}</h1>
+                        <h1 class="mb-3 text-3xl text-uppercase font-weight-bold">{{konten.judul}}</h1>
                         <p>{{konten.isi_konten|safe}}</p>
                     </div>
                     <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
@@ -108,63 +108,53 @@
                 <!-- Comment List Start -->
                 <div class="mb-3">
                     <div id="comments-section" class="section-title mb-0">
-                        <h4 class="m-0 text-uppercase font-weight-bold">{{ komentars }}
-                            Comments</h4>
+                        <h4 class="m-0 text-uppercase font-weight-bold">{{ komentars }} Comments</h4>
                     </div>
                     <div class="bg-white border border-top-0 p-4 rounded-lg shadow">
                         {% for komen in konten.komentar.all %}
-                        <div id="komen-{{ komen.id }}" class="media mb-4">
-                            <a class="text-secondary font-weight-bold"
-                                href="{% url 'user:user_profil' komen.user.pk %}">
-                                <img src="{{ komen.user.foto.url }}" alt="User Image"
-                                    class="img-fluid rounded-full mr-3" style="width: 34px;">
+                        <div id="komen-{{ komen.id }}" class="media mb-4 position-relative">
+                            <a class="text-secondary font-weight-bold" href="{% url 'user:user_profil' komen.user.pk %}">
+                                <img src="{{ komen.user.foto.url }}" alt="User Image" class="img-fluid rounded-full mr-3" style="width: 34px;">
                             </a>
                             <div>
                                 <div class="flex items-center justify-between">
                                     <h6 class="font-bold">{{ komen.user.username }}</h6>
-                                    <small class="text-gray-500 text-[12px] relative left-1">
+                                    <small class="text-gray-500 text-[12px] absolute left-[99px]" style="top: 0; right: 10px;">
                                         <i>{{ komen.created_at|timesince }} ago</i>
                                     </small>
                                 </div>
                                 <p>{{ komen.pesan }}</p>
-                                <button class="btn btn-sm btn-outline-secondary"
-                                    onclick="toggleReplyForm({{ komen.id }})">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="toggleReplyForm({{ komen.id }})">
                                     Reply
                                 </button>
-
+                
                                 {% if komen.user.pk == request.user.pk %}
                                 <div class="dropdown d-inline-block">
                                     <button class="btn btn-sm btn-outline-secondary items-center" type="button"
-                                        id="dropdownMenuButton-{{ komen.id }}" data-bs-toggle="dropdown"
-                                        aria-expanded="false">
+                                        id="dropdownMenuButton-{{ komen.id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class='bx bx-chevron-down font-bolder relative top-[1px]' ></i>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ komen.id }}">
-                                        <li><a class="dropdown-item" href="#"
-                                                onclick="showUpdateKomenForm({{ komen.id }})">Update</a></li>
-                                                <li>
-                                                    <a class="dropdown-item" href="#" onclick="confirmDelete({{ komen.id }})">Delete</a>
-                                                </li>
-
-                                                <!-- Formulir Delete -->
-                                                <form id="delete-form-{{ komen.id }}" method="post" action="{% url 'user:komentar_delete' komen.id %}" style="display:none;">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                                </form>
+                                        <li><a class="dropdown-item" href="#" onclick="showUpdateKomenForm({{ komen.id }})">Update</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="confirmDelete({{ komen.id }})">Delete</a></li>
+                
+                                        <!-- Form Delete -->
+                                        <form id="delete-form-{{ komen.id }}" method="post" action="{% url 'user:komentar_delete' komen.id %}" style="display:none;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
                                     </ul>
                                 </div>
-
+                
                                 <!-- Form Update -->
                                 <div id="update-form-{{ komen.id }}" class="update-form" style="display:none;">
                                     <form action="{% url 'user:komentar_update' komen.id %}" method="post">
                                         {% csrf_token %}
                                         <div class="form-group mt-1">
-                                            <textarea name="pesan" class="form-control"
-                                                rows="3">{{ komen.pesan }}</textarea>
+                                            <textarea name="pesan" class="form-control" rows="3">{{ komen.pesan }}</textarea>
                                         </div>
                                         <button type="submit" class="btn btn-primary">Update</button>
-                                        <button type="button" class="btn btn-danger"
-                                            onclick="hideUpdateKomenForm({{ komen.id }})">X</button>
+                                        <button type="button" class="btn btn-danger" onclick="hideUpdateKomenForm({{ komen.id }})">X</button>
                                     </form>
                                 </div>
                                 {% endif %}
@@ -481,18 +471,21 @@
 <script>
     function toggleReplyForm(komenId, replyId = null) {
         const allReplyForms = document.querySelectorAll('[id^="reply-form-"]');
+        const allUpdateForms = document.querySelectorAll('[id^="update-form-"]');
 
         allReplyForms.forEach(function (form) {
             form.style.display = "none";
         });
+        allUpdateForms.forEach(function (form) {
+            form.style.display = "none";
+        });
 
-        const replyFormId = replyId ?
-            `reply-form-${replyId}` :
-            `reply-form-${komenId}`;
+        const replyFormId = replyId ? `reply-form-${replyId}` : `reply-form-${komenId}`;
         const replyForm = document.getElementById(replyFormId);
 
         if (replyForm) {
             replyForm.style.display = "block";
+            smoothScroll(replyForm, 300);
         }
     }
 
@@ -537,6 +530,31 @@
         }
     });
 
+    function smoothScroll(target, duration) {
+        const start = window.scrollY;
+        const end = target.getBoundingClientRect().top + start;
+        const distance = end - start;
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const run = easeInOutQuad(timeElapsed, start, distance, duration);
+            window.scrollTo(0, run);
+
+            if (timeElapsed < duration) requestAnimationFrame(animation);
+        }
+
+        function easeInOutQuad(t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        }
+
+        requestAnimationFrame(animation);
+    }
+
     function scrollToElementById(id) {
         const element = document.getElementById(id);
         if (element) {
@@ -547,6 +565,16 @@
     }
 
     function showUpdateKomenForm(komenId) {
+        const allReplyForms = document.querySelectorAll('[id^="reply-form-"]');
+        const allUpdateForms = document.querySelectorAll('[id^="update-form-"]');
+
+        allReplyForms.forEach(function (form) {
+            form.style.display = "none";
+        });
+        allUpdateForms.forEach(function (form) {
+            form.style.display = "none";
+        });
+
         var form = document.getElementById('update-form-' + komenId);
         form.style.display = 'block';
 
@@ -561,7 +589,7 @@
     function hideUpdateKomenForm(KomenId) {
         var form = document.getElementById('update-form-' + KomenId);
         form.style.display = 'none';
-    
+
         setTimeout(function () {
             var commentSection = document.getElementById('comments-section');
             commentSection.scrollIntoView({
@@ -575,7 +603,7 @@
         if (confirm('Yakin ingin menghapus komentar ini?')) {
             document.getElementById('delete-form-' + komenId).submit();
         } else {
-            setTimeout(function() {
+            setTimeout(function () {
                 var commentSection = document.getElementById('comments-section');
                 commentSection.scrollIntoView({
                     behavior: 'smooth',
@@ -584,7 +612,6 @@
             }, 300);
         }
     }
-
 
     function hideUpdateReplyForm(replyId) {
         var form = document.getElementById('update-form-' + replyId);
@@ -603,7 +630,7 @@
         if (confirm('Yakin ingin menghapus balasan?')) {
             document.getElementById('delete-form-' + replyId).submit();
         } else {
-            setTimeout(function() {
+            setTimeout(function () {
                 var commentSection = document.getElementById('comments-section');
                 commentSection.scrollIntoView({
                     behavior: 'smooth',
@@ -614,10 +641,11 @@
     }
 
     window.addEventListener('load', function () {
-        if (window.location.hash) {
-            var target = document.querySelector(window.location.hash);
-            if (target) {
-                target.scrollIntoView({
+        const hash = window.location.hash;
+        if (hash) {
+            const targetElement = document.querySelector(hash);
+            if (targetElement) {
+                targetElement.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'
                 });
