@@ -61,6 +61,8 @@ class Komunitas(models.Model):
     status = models.BooleanField(default=True)
     jumlah_pertanyaan = models.IntegerField(default=0, null=True, blank=True)
 
+    members = models.ManyToManyField(User, related_name='komunitas_members', blank=True)
+
     class Meta:
         verbose_name = "Komunitas"
         verbose_name_plural = "Komunitas"

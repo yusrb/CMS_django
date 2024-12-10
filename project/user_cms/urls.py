@@ -11,6 +11,8 @@ from .views import (
 
     KomunitasListView,
     KomunitasDetailView,
+    KomunitasJoinView,
+
     PertanyaanCreateView,
     PertanyaanDeleteView,
     PertanyaanUpdateView,
@@ -50,13 +52,15 @@ urlpatterns = [
 
     path('komunitas/', KomunitasListView.as_view(), name="komunitas_list"),
     path('komunitas/<int:pk>/', KomunitasDetailView.as_view(), name='komunitas_detail'),
+    path('komunitas/join/<int:pk>', KomunitasJoinView, name='komunitas_join'),
+
     path('komunitas/<int:komunitas_id>/tanya/', PertanyaanCreateView, name='pertanyaan_komunitas_create'),
     path('pertanyaan/<int:pertanyaan_id>/edit/', PertanyaanUpdateView, name='pertanyaan_komunitas_update'),
     path('pertanyaan/<int:pertanyaan_id>/delete/', PertanyaanDeleteView, name='pertanyaan_komunitas_delete'),
 
     path('pertanyaan/<int:pertanyaan_id>/jawab/create', JawabanPertanyaanCreateView, name='jawab_pertanyaan'),
     path('pertanyaan/<int:pertanyaan_id>/jawab/<int:jawaban_id>/delete/', JawabanPertanyaanDeleteView, name='jawab_pertanyaan_delete'),
-    path('jawaban/update/<int:pertanyaan_id>/<int:jawaban_id>/', JawabanPertanyaanUpdateView, name='jawab_pertanyaan_update'),
+    path('pertanyaan/<int:pertanyaan_id>/jawab/<int:jawaban_id>/update', JawabanPertanyaanUpdateView, name='jawab_pertanyaan_update'),
 
     path('' , KontenListView.as_view() , name="konten_list"),
     path('post/latest' , KontenLatestListView.as_view() , name="konten_latest"),
@@ -67,8 +71,8 @@ urlpatterns = [
     path('update_komen/<int:komen_id>/', KomentarUpdateView.as_view(), name='komentar_update'),
     path('delete_komen/<int:komen_id>/', KomentarDeleteView.as_view(), name='komentar_delete'),
 
-     path('reply/<int:reply_id>/edit/', ReplyUpdateView.as_view(), name='reply_update'),
-     path('reply/<int:reply_id>/delete/', ReplyDeleteView.as_view(), name='reply_delete'),
+    path('reply/<int:reply_id>/edit/', ReplyUpdateView.as_view(), name='reply_update'),
+    path('reply/<int:reply_id>/delete/', ReplyDeleteView.as_view(), name='reply_delete'),
 
     path('kategori/' , KategoriListView.as_view() , name="kategori_list"),
     path('kategori/detail/<int:pk>' , KategoriDetailView.as_view() , name="kategori_detail"),

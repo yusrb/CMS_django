@@ -41,9 +41,9 @@ class AktivitasAdmin(admin.ModelAdmin):
 
 # KontenAdmin
 class KontenAdmin(admin.ModelAdmin):
-    list_display = ('judul', 'kategori', 'formatted_tanggal', 'dilihat', 'username')
+    list_display = ('judul', 'kategori', 'formatted_tanggal',)
     search_fields = ('judul',)
-    readonly_fields = ['dilihat', 'user', 'username', 'slug']
+    exclude = ('username','user')
 
     def formatted_tanggal(self, obj):
         return localtime(obj.tanggal).strftime('%d %b %Y, %H:%M WIB')

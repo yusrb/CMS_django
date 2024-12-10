@@ -1,10 +1,10 @@
 import random
+from django.shortcuts import redirect , render , get_object_or_404
 from django.shortcuts import (
     render,
     redirect,
 )
 from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
-from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from urllib.parse import urlencode
@@ -21,7 +21,6 @@ from django.urls import reverse_lazy , reverse
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm , UserCreationForm
 from .forms import CustomUserCreationForm, ReplyForm
-from django.shortcuts import redirect , render , get_object_or_404
 from django.contrib.auth.views import (
     LoginView,
     LogoutView,
@@ -299,8 +298,28 @@ class KomunitasDetailView(DetailView):
 
         return context
 
+def KomunitasJoinView(request, pk):
+    if not request.user.is_authenticated:
+        messages.error(request, "Anda perlu login terlebih dahulu untuk bergabung dengan komunitas.")
+        return redirect('user:user_login')
+
+    komunitas = get_object_or_404(Komunitas, pk=pk)
+
+    if request.user in komunitas.members.all():
+        messages.info(request, "Anda sudah bergabung dengan komunitas ini.")
+        return redirect('user:komunitas_detail', pk=komunitas.pk)
+
+    komunitas.members.add(request.user)
+    messages.success(request, f"Anda berhasil bergabung dengan komunitas {komunitas.nama}.")
+
+    return redirect('user:komunitas_detail', pk=komunitas.pk)
+
 def PertanyaanCreateView(request, komunitas_id):
     komunitas = get_object_or_404(Komunitas, id=komunitas_id)
+
+    if request.user not in komunitas.members.all():
+        messages.error(request, "Hanya anggota komunitas yang bisa membuat pertanyaan.")
+        return redirect('user:komunitas_detail', pk=komunitas.id)
 
     if request.user.is_authenticated:
         if request.method == 'POST':
@@ -331,7 +350,6 @@ def PertanyaanCreateView(request, komunitas_id):
 
     return render(request, 'user/komunitas_detail.html', context)
 
-@login_required
 def PertanyaanDeleteView(request, pertanyaan_id):
     pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
 
@@ -343,7 +361,6 @@ def PertanyaanDeleteView(request, pertanyaan_id):
     query_params = urlencode({'scroll_to': 'pertanyaan-list'})
     return redirect(f"{url}?{query_params}")
 
-@login_required
 def PertanyaanUpdateView(request, pertanyaan_id):
     pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
 
@@ -370,6 +387,10 @@ def PertanyaanUpdateView(request, pertanyaan_id):
 
 def JawabanPertanyaanCreateView(request, pertanyaan_id):
     pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
+
+    if request.user not in pertanyaan.komunitas.members.all():
+        messages.error(request, "Hanya anggota komunitas yang bisa memberikan jawaban.")
+        return redirect('user:komunitas_detail', pk=pertanyaan.komunitas.id)
 
     if request.user.is_authenticated:
         if request.method == "POST":

@@ -16,6 +16,28 @@
                         href="{% url 'user:komunitas_list' %}">Kembali ke Home</a>
                 </div>
 
+                <!-- Modal Error -->
+                {% if messages %}
+                    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content rounded-lg shadow-xl">
+                                <div class="modal-header bg-warning text-black border-0">
+                                    <h5 class="modal-title" id="errorModalLabel">Pesan Error</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body bg-white text-black py-4">
+                                    {% for message in messages %}
+                                        <p>{{ message }}</p>
+                                    {% endfor %}
+                                </div>
+                                <div class="modal-footer bg-white border-0">
+                                    <button type="button" class="btn btn-warning text-black" data-bs-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
                 <div class="card shadow-sm mb-4">
                     <div class="card-body text-center">
                         <div class="mb-3">
@@ -245,7 +267,7 @@
 
             <!-- Sidebar -->
             <div class="w-[30.3%] left-2 relative">
-                <div class="card">
+                <div class="card shadow-lg rounded-lg border border-z-300">
                     <div class="card-header bg-warning text-white">
                         <h5 class="font-semibold text-xl relative top-1">Informasi Komunitas</h5>
                     </div>
@@ -255,6 +277,21 @@
                             <li><strong>Dibuat pada:</strong> {{ komunitas.tanggal|date:"d, M Y" }}</li>
                             <li><strong>Pengguna Online:</strong> {{ users_online }}</li>
                         </ul>
+
+                        <hr class="relative">
+
+                        {% if user in komunitas.members.all %}
+                        <button class="btn btn-gray-500 w-full text-sm font-semibold mt-4" disabled>Anda Sudah
+                            Bergabung</button>
+                        {% else %}
+                        <form method="post" action="{% url 'user:komunitas_join' komunitas.pk %}" class="mt-4">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="px-3 py-3 relative bottom-1 bg-gradient-to-br from-[#A4A4A4] to-[#B0B0B0] w-full rounded-md text-sm text-white font-semibold transition-all duration-300 hover:from-[#8A8A8A] hover:to-[#D0D0D0] focus:outline-none focus:ring-2 focus:ring-[#707070] shadow-2xl hover:shadow-2xl border-2 border-[#B0B0B0] hover:border-[#A0A0A0]">
+                                Bergabung dengan Komunitas
+                            </button>
+                        </form>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -265,8 +302,11 @@
                     <div class="card-body">
                         <ul class="space-y-2">
                             {% for bookmark in bookmarks %}
-                            <li><a href="{{ bookmark.url_link }}" target="_blank"
-                                    class="text-lg font-extrabold text-gray-600 hover:text-gray-800">{{ bookmark.judul }}</a>
+                            <li>
+                                <a href="{{ bookmark.url_link }}" target="_blank"
+                                    class="text-lg font-extrabold text-gray-600 hover:text-gray-800">
+                                    {{ bookmark.judul }}
+                                </a>
                             </li>
                             {% endfor %}
                         </ul>
@@ -298,6 +338,7 @@
                 </div>
             </div>
             <!-- Sidebar End -->
+
 
 
         </div>
@@ -355,11 +396,10 @@
         }
     }
 
-    // Fungsi untuk menampilkan konfirmasi penghapusan jawaban
     function confirmDeleteJawaban(jawabanId) {
         var form = document.getElementById('delete-form-jawaban-' + jawabanId);
         if (confirm('Apakah Anda yakin ingin menghapus jawaban ini?')) {
-            form.submit(); // Kirim form penghapusan
+            form.submit();
         }
     }
 
@@ -413,6 +453,11 @@
             arrowElement.classList.add('fa-chevron-down');
         }
     }
+
+    {% if messages %}
+            var myModal = new bootstrap.Modal(document.getElementById('errorModal'), {});
+            myModal.show();
+        {% endif %}
 </script>
 
 
