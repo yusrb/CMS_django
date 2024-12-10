@@ -18,24 +18,27 @@
 
                 <!-- Modal Error -->
                 {% if messages %}
-                    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content rounded-lg shadow-xl">
-                                <div class="modal-header bg-warning text-black border-0">
-                                    <h5 class="modal-title" id="errorModalLabel">Pesan Error</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body bg-white text-black py-4">
-                                    {% for message in messages %}
-                                        <p>{{ message }}</p>
-                                    {% endfor %}
-                                </div>
-                                <div class="modal-footer bg-white border-0">
-                                    <button type="button" class="btn btn-warning text-black" data-bs-dismiss="modal">Tutup</button>
-                                </div>
+                <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content rounded-lg shadow-xl">
+                            <div class="modal-header bg-warning text-black border-0">
+                                <h5 class="modal-title" id="errorModalLabel">Pesan</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body bg-white text-black py-4">
+                                {% for message in messages %}
+                                <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                            <div class="modal-footer bg-white border-0">
+                                <button type="button" class="btn btn-warning text-black"
+                                    data-bs-dismiss="modal">Tutup</button>
                             </div>
                         </div>
                     </div>
+                </div>
                 {% endif %}
 
                 <div class="card shadow-sm mb-4">
@@ -96,8 +99,40 @@
                                 <h6 class="font-weight-bold mt-1">{{ pertanyaan.judul }}</h6>
                                 <p class="text-muted">{{ pertanyaan.isi|truncatewords:30 }}</p>
                                 <small class="text-muted d-block">
-                                    <i class="fas fa-user"></i> Ditanyakan oleh {{ pertanyaan.penulis }}
-                                    <i class="fas fa-clock ml-2"></i> {{ pertanyaan.created_at|timesince }}
+                                    <div class="d-flex align-items-center">
+                                        {% if pertanyaan.penulis.pk == request.user.pk %}
+                                        <a href="{% url 'user:user_profil' pertanyaan.penulis.pk %}"
+                                            class="d-flex align-items-center">
+                                            {% if pertanyaan.penulis.foto %}
+                                            <img class="rounded-circle mr-[6px]" src="{{ pertanyaan.penulis.foto.url }}"
+                                                width="25" height="25" alt="{{ pertanyaan.penulis.username }}">
+                                            {% else %}
+                                            <img class="rounded-circle mr-2"
+                                                src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                                                width="25" height="25" alt="Default Profile Picture">
+                                            {% endif %}
+                                            <span class="font-semibold">{{ pertanyaan.penulis.username }}</span>
+                                        </a>
+                                        {% else %}
+                                        <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
+                                            class="d-flex align-items-center">
+                                            {% if pertanyaan.penulis.foto %}
+                                            <img class="rounded-circle mr-2" src="{{ pertanyaan.penulis.foto.url }}"
+                                                width="25" height="25" alt="{{ pertanyaan.penulis.username }}">
+                                            {% else %}
+                                            <img class="rounded-circle mr-2"
+                                                src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                                                width="25" height="25" alt="Default Profile Picture">
+                                            {% endif %}
+                                            <span class="font-semibold">{{ pertanyaan.penulis.username }}</span>
+                                        </a>
+                                        {% endif %}
+
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-clock ml-[12px]"></i>
+                                            <p class="ml-1 mb-0">{{ pertanyaan.created_at|timesince }} ago</p>
+                                        </div>
+                                    </div>
                                 </small>
 
                                 <!-- Lihat Jawaban -->
@@ -105,85 +140,114 @@
                                     data-bs-target="#jawabanModal-{{ pertanyaan.id }}">Lihat Jawaban</button>
 
                                 <!-- Modal Jawaban -->
-                                <div class="modal fade" id="jawabanModal-{{ pertanyaan.id }}" tabindex="-1"
-                                aria-labelledby="jawabanModalLabel-{{ pertanyaan.id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-lg rounded">
-                                    <div class="modal-content bg-light border-0 rounded">
-                                        <div class="modal-header bg-warning text-dark">
-                                            <h5 class="modal-title" id="jawabanModalLabel-{{ pertanyaan.id }}">
-                                                Jawaban untuk: {{ pertanyaan.judul }}
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-
-                                        <!-- Modal Body -->
-                                        <div class="modal-body">
-                                            <!-- Pertanyaan -->
-                                            <div class="mb-4">
-                                                <h4 class="text-dark fw-bold mb-2">{{ pertanyaan.judul }}</h4>
-                                                <p class="text-dark mb-2">{{ pertanyaan.isi }}</p>
-                                                <p class="text-muted small d-flex align-items-center">
-                                                    <i class="fas fa-user me-2"></i>
-                                                    <span>Ditanyakan oleh: <strong>{{ pertanyaan.penulis.username }}</strong></span>
-                                                    <i class="fas fa-clock ms-3 me-2"></i>
-                                                    <span>{{ pertanyaan.created_at|timesince }} yang lalu</span>
-                                                </p>
+                                <div class="modal fade" id="jawabanModal-{{ pertanyaan.id }}" tabindex="1"
+                                    aria-labelledby="jawabanModalLabel-{{ pertanyaan.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg rounded">
+                                        <div class="modal-content bg-light border-0 rounded">
+                                            <div class="modal-header bg-warning text-dark">
+                                                <h5 class="modal-title" id="jawabanModalLabel-{{ pertanyaan.id }}">
+                                                    Jawaban untuk: {{ pertanyaan.judul }}
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
                                             </div>
 
-                                            <hr class="my-3">
+                                            <!-- Modal Body -->
+                                            <div class="modal-body">
+                                                <!-- Pertanyaan -->
+                                                <div class="mb-4">
+                                                    <h4 class="text-dark fw-bold mb-2">{{ pertanyaan.judul }}
+                                                    </h4>
+                                                    <p class="text-dark mb-2">{{ pertanyaan.isi }}</p>
 
-                                            <!-- Jawaban Section -->
-                                            <h5 class="font-bold text-xl text-center mb-3">Jawaban</h5>
-                                            <div id="jawaban-list-{{ pertanyaan.id }}" class="mb-4">
-                                                {% for jawaban in pertanyaan.jawaban_set.all %}
-                                                <div class="alert bg-white border p-3 mb-3 rounded position-relative shadow-sm">
-                                                    <!-- Opsi untuk Pengguna -->
-                                                    {% if jawaban.penulis == user %}
-                                                    <div class="position-absolute top-0 end-0 mt-2 me-2">
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-sm text-dark" type="button"
-                                                                id="dropdownMenuButtonJawaban-{{ jawaban.id }}" data-bs-toggle="dropdown"
-                                                                aria-expanded="false">
-                                                                <i class="fas fa-ellipsis-v"></i>
-                                                            </button>
-                                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonJawaban-{{ jawaban.id }}">
-                                                                <li><a class="dropdown-item text-danger" href="#"
-                                                                        onclick="confirmDeleteJawaban({{ jawaban.id }})">Hapus</a></li>
-                                                                <li><a class="dropdown-item" href="#"
-                                                                        data-bs-toggle="modal" data-bs-target="#updateJawabanModal-{{ jawaban.id }}">Edit</a></li>
-                                                            </ul>
+                                                    <p class="text-muted small d-flex align-items-center">
+                                                        <!-- Foto Profil Penulis -->
+                                                        {% if pertanyaan.penulis.foto %}
+                                                        <a href="{% url 'user:user_profil' pertanyaan.penulis.pk %}"
+                                                            class="d-flex align-items-center">
+                                                            <img class="rounded-circle me-2 ml-1"
+                                                                src="{{ pertanyaan.penulis.foto.url }}" width="25"
+                                                                height="25" alt="{{ pertanyaan.penulis.username }}">
+                                                        </a>
+                                                        {% else %}
+                                                        <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
+                                                            class="d-flex align-items-center">
+                                                            <img class="rounded-circle me-2 ml-1"
+                                                                src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                                                                width="25" height="25" alt="Default Profile Picture">
+                                                        </a>
+                                                        {% endif %}
+                                                        <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
+                                                            class="font-semibold">
+                                                            {{ pertanyaan.penulis.username }}
+                                                        </a>
+                                                        <span class="d-flex align-items-center ms-3">
+                                                            <i class="fas fa-clock ms-3"></i>
+                                                            <span class="ml-1">{{ pertanyaan.created_at|timesince }}
+                                                                ago</span>
+                                                        </span>
+                                                    </p>
+                                                </div>
+
+
+                                                <hr class="my-3">
+
+                                                <!-- Jawaban Section -->
+                                                <h5 class="font-bold text-xl text-center mb-3">Jawaban</h5>
+                                                <div id="jawaban-list-{{ pertanyaan.id }}" class="mb-4">
+                                                    {% for jawaban in pertanyaan.jawaban_set.all %}
+                                                    <div class="alert bg-white border p-3 mb-3 rounded position-relative shadow-sm">
+                                                        {% if jawaban.penulis == request.user %}
+                                                        <div class="position-absolute top-0 end-0 mt-2 me-2">
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-sm text-dark" type="button" id="dropdownMenuButtonJawaban-{{ jawaban.id }}"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonJawaban-{{ jawaban.id }}">
+                                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#updateJawabanModal-{{ jawaban.id }}">Edit</a></li>
+                                                                    <li><a class="dropdown-item text-danger" href="#" onclick="confirmDeleteJawaban({{ jawaban.id }})">Hapus</a></li>
+                                                                </ul>
+                                                            </div>
                                                         </div>
+                                                        {% endif %}
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            {% if jawaban.penulis.foto %}
+                                                            <a href="{% url 'user:user_profil' jawaban.penulis.pk %}" class="d-flex align-items-center me-2">
+                                                                <img class="rounded-circle" src="{{ jawaban.penulis.foto.url }}" width="25" height="25" alt="{{ jawaban.penulis.username }}">
+                                                            </a>
+                                                            {% else %}
+                                                            <a href="{% url 'user:user_detail' jawaban.penulis.pk %}" class="d-flex align-items-center me-2">
+                                                                <img class="rounded-circle" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" width="25" height="25" alt="Default Profile Picture">
+                                                            </a>
+                                                            {% endif %}
+                                                            <a href="{% url 'user:user_profil' jawaban.penulis.pk %}" class="font-semibold me-2">{{ jawaban.penulis.username }}</a>
+                                                            <small class="text-muted">{{ jawaban.created_at|timesince }} yang lalu</small>
+                                                        </div>
+                                                        <p class="text-dark mt-2">{{ jawaban.isi }}</p>
                                                     </div>
-                                                    {% endif %}
-                                                    <!-- Isi Jawaban -->
-                                                    <strong class="text-dark small d-block mb-1">{{ jawaban.penulis.username }}</strong>
-                                                    <small class="text-muted">{{ jawaban.created_at|timesince }} yang lalu</small>
-                                                    <p class="text-dark mt-2">{{ jawaban.isi }}</p>
+                                                    {% endfor %}
                                                 </div>
 
-                                                <!-- Form Hapus Jawaban -->
-                                                <form id="delete-form-jawaban-{{ jawaban.id }}" method="post"
-                                                    action="{% url 'user:jawab_pertanyaan_delete' pertanyaan_id=pertanyaan.id jawaban_id=jawaban.id %}"
-                                                    style="display:none;">
+                                                <!-- Form Jawaban -->
+                                                <form
+                                                    action="{% url 'user:jawab_pertanyaan' pertanyaan_id=pertanyaan.id %}"
+                                                    method="post">
                                                     {% csrf_token %}
-                                                    <button type="submit"></button>
+                                                    <div class="form-group mb-3">
+                                                        <label for="jawaban-{{ pertanyaan.id }}"
+                                                            class="form-label font-bold text-gray-800">Jawaban
+                                                            Anda</label>
+                                                        <textarea name="isi" class="form-control" rows="3"
+                                                            placeholder="Tulis jawaban Anda di sini..."
+                                                            required></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-warning btn-sm">Kirim
+                                                        Jawaban</button>
                                                 </form>
-                                                {% endfor %}
                                             </div>
-
-                                            <!-- Form Tambah Jawaban -->
-                                            <form action="{% url 'user:jawab_pertanyaan' pertanyaan_id=pertanyaan.id %}" method="post">
-                                                {% csrf_token %}
-                                                <div class="form-group mb-3">
-                                                    <label for="jawaban-{{ pertanyaan.id }}" class="form-label font-bold text-gray-800">Jawaban Anda</label>
-                                                    <textarea name="isi" class="form-control" rows="3" placeholder="Tulis jawaban Anda di sini..." required></textarea>
-                                                </div>
-                                                <button type="submit" class="btn btn-warning btn-sm">Kirim Jawaban</button>
-                                            </form>
                                         </div>
                                     </div>
-                                </div>
-
                                 </div>
 
                                 <!-- Modal Update Jawaban -->
@@ -195,16 +259,21 @@
                                             <div class="modal-header bg-warning text-dark">
                                                 <h5 class="modal-title" id="updateJawabanModalLabel-{{ jawaban.id }}">
                                                     Update Jawaban untuk: {{ jawaban.pertanyaan.judul }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <form action="{% url 'user:jawab_pertanyaan_update' pertanyaan_id=pertanyaan.id jawaban_id=jawaban.id %}" method="post">
+                                                <form
+                                                    action="{% url 'user:jawab_pertanyaan_update' pertanyaan_id=pertanyaan.id jawaban_id=jawaban.id %}"
+                                                    method="post">
                                                     {% csrf_token %}
                                                     <div class="form-group">
                                                         <label for="jawaban-{{ jawaban.id }}">Jawaban Anda</label>
-                                                        <textarea name="isi" class="form-control" rows="3" required>{{ jawaban.isi }}</textarea>
+                                                        <textarea name="isi" class="form-control" rows="3"
+                                                            required>{{ jawaban.isi }}</textarea>
                                                     </div>
-                                                    <button type="submit" class="btn btn-warning btn-sm mt-3">Update Jawaban</button>
+                                                    <button type="submit" class="btn btn-warning btn-sm mt-3">Update
+                                                        Jawaban</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -268,69 +337,79 @@
             <!-- Sidebar -->
             <div class="w-[30.3%] left-2 relative">
                 <div class="card shadow-lg rounded-lg border border-z-300">
-                    <div class="card-header bg-warning text-white">
+                    <div class="section-title text-white">
                         <h5 class="font-semibold text-xl relative top-1">Informasi Komunitas</h5>
                     </div>
                     <div class="card-body text-sm">
-                        <ul class="space-y-2">
-                            <li><strong>Pembuat:</strong> {{ komunitas.user.username }}</li>
-                            <li><strong>Dibuat pada:</strong> {{ komunitas.tanggal|date:"d, M Y" }}</li>
-                            <li><strong>Pengguna Online:</strong> {{ users_online }}</li>
-                        </ul>
+                        <div class="flex flex-col lg:flex-row lg:gap-8">
+                            <div class="flex-1">
+                                <ul class="space-y-4">
+                                    <li>
+                                        <strong>Pembuat:</strong>
+                                        <p>{{ komunitas.user.username }}</p>
+                                    </li>
+                                    <li>
+                                        <strong>Dibuat pada:</strong>
+                                        <p>{{ komunitas.tanggal|date:"d, M Y" }}</p>
+                                    </li>
+                                    <li>
+                                        <strong>Pengguna Online:</strong>
+                                        <p>{{ users_online }}</p>
+                                    </li>
+                                    <li>
+                                        <strong>Jumlah Anggota:</strong>
+                                        <p>{{ komunitas.members.count }}</p>
+                                    </li>
+                                </ul>
+                            </div>
 
-                        <hr class="relative">
+                            <div class="flex-1 mt-4 lg:mt-0">
+                                {% if user in komunitas.members.all %}
+                                <button class="px-1 py-2 bg-red-white hover:bg-gray-500 relative top-40 left-5 rounded text-gray-400 hover:text-white text-[10px] font-semibold mt-1"
+                                    data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">
+                                    Keluar dari Komunitas
+                                </button>
 
-                        {% if user in komunitas.members.all %}
-                        <button class="btn btn-yellow-500 w-full text-sm font-semibold mt-4" disabled>Anda Sudah
-                            Bergabung</button>
-                        <button class="px-3 py-3 rounded text-white bg-red-500 w-full text-sm font-semibold mt-1" data-bs-toggle="modal"
-                            data-bs-target="#confirmLeaveModal">
-                            Keluar dari Komunitas
-                        </button>
-
-                        <!-- Modal Confirm Keluar -->
-                        <div class="modal fade" id="confirmLeaveModal" tabindex="-1"
-                            aria-labelledby="confirmLeaveModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-warning">
-                                        <h5 class="modal-title" id="confirmLeaveModalLabel">Konfirmasi Keluar</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Apakah Anda yakin ingin keluar dari komunitas {{ komunitas.nama }}?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Batal</button>
-                                        <form method="post" action="{% url 'user:komunitas_keluar' komunitas.pk %}"
-                                            class="d-inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-danger">Ya, Keluar</button>
-                                        </form>
+                                <!-- Modal Confirm Keluar -->
+                                <div class="modal fade" id="confirmLeaveModal" tabindex="-1" aria-labelledby="confirmLeaveModalLabel"
+                                    aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-warning">
+                                                <h5 class="modal-title" id="confirmLeaveModalLabel">Konfirmasi Keluar</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Apakah Anda yakin ingin keluar dari komunitas {{ komunitas.nama }}?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                <form method="post" action="{% url 'user:komunitas_keluar' komunitas.pk %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Ya, Keluar</button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                {% else %}
+                                <form method="post" action="{% url 'user:komunitas_join' komunitas.pk %}" class="mt-4">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                        class="px-1 py-1 relative top-32 left-2 bg-gradient-to-br from-[#FBC02D] to-[#FF9800] w-full rounded-md text-[10px] text-white font-semibold transition-all duration-300 hover:from-[#FFEB3B] hover:to-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FF7043] shadow-sm hover:shadow-sm">
+                                        Bergabung dengan Komunitas
+                                    </button>
+                                </form>
+                                {% endif %}
                             </div>
                         </div>
-
-                        {% else %}
-                        <form method="post" action="{% url 'user:komunitas_join' komunitas.pk %}" class="mt-4">
-                            {% csrf_token %}
-                            <button type="submit"
-                                class="px-3 py-3 relative bottom-1 bg-gradient-to-br from-[#FBC02D] to-[#FF9800] w-full rounded-md text-sm text-white font-semibold transition-all duration-300 hover:from-[#FFEB3B] hover:to-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FF7043] shadow-2xl hover:shadow-2xl">
-                                Bergabung dengan Komunitas
-                            </button>
-                        </form>
-                        {% endif %}
-
                     </div>
-                    </div>
+                </div>
 
-                    <div class="card mt-6">
-                        <div class="card-header bg-warning text-white">
-                            <h5 class="font-semibold text-xl relative top-1">Bookmarks Komunitas</h5>
-                        </div>
+                <div class="card mt-6">
+                    <div class="section-title text-white">
+                        <h5 class="font-semibold text-xl relative top-1">Bookmarks Komunitas</h5>
+                    </div>
                     <div class="card-body">
                         <ul class="space-y-2">
                             {% for bookmark in bookmarks %}
@@ -346,11 +425,11 @@
                 </div>
 
                 <div class="card mt-6">
-                    <div class="card-header bg-warning text-white">
+                    <div class="section-title text-white">
                         <h5 class="font-semibold text-xl relative top-1">Peraturan Komunitas</h5>
                     </div>
                     <div class="card-body text-sm">
-                        <ul class="space-y-2">
+                        <ul class="space-y-3">
                             {% for peraturan in peraturans %}
                             <li>
                                 <button
@@ -370,9 +449,6 @@
                 </div>
             </div>
             <!-- Sidebar End -->
-
-
-
         </div>
     </div>
 </div>
@@ -486,10 +562,10 @@
         }
     }
 
-    {% if messages %}
-            var myModal = new bootstrap.Modal(document.getElementById('errorModal'), {});
-            myModal.show();
-        {% endif %}
+    {%if messages %}
+    var myModal = new bootstrap.Modal(document.getElementById('errorModal'), {});
+    myModal.show();
+    {% endif %}
 </script>
 
 

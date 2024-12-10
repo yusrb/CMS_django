@@ -119,7 +119,7 @@
                             <div>
                                 <div class="flex items-center justify-between">
                                     <h6 class="font-bold">{{ komen.user.username }}</h6>
-                                    <small class="text-gray-500 text-[12px] absolute left-[99px]" style="top: 0; right: 10px;">
+                                    <small class="text-gray-500 text-[12px] absolute left-[107px]" style="top: 0; right: 10px;">
                                         <i>{{ komen.created_at|timesince }} ago</i>
                                     </small>
                                 </div>
@@ -127,7 +127,7 @@
                                 <button class="btn btn-sm btn-outline-secondary" onclick="toggleReplyForm({{ komen.id }})">
                                     Reply
                                 </button>
-                
+
                                 {% if komen.user.pk == request.user.pk %}
                                 <div class="dropdown d-inline-block">
                                     <button class="btn btn-sm btn-outline-secondary items-center" type="button"
@@ -137,7 +137,7 @@
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ komen.id }}">
                                         <li><a class="dropdown-item" href="#" onclick="showUpdateKomenForm({{ komen.id }})">Update</a></li>
                                         <li><a class="dropdown-item" href="#" onclick="confirmDelete({{ komen.id }})">Delete</a></li>
-                
+
                                         <!-- Form Delete -->
                                         <form id="delete-form-{{ komen.id }}" method="post" action="{% url 'user:komentar_delete' komen.id %}" style="display:none;">
                                             {% csrf_token %}
@@ -145,7 +145,7 @@
                                         </form>
                                     </ul>
                                 </div>
-                
+
                                 <!-- Form Update -->
                                 <div id="update-form-{{ komen.id }}" class="update-form" style="display:none;">
                                     <form action="{% url 'user:komentar_update' komen.id %}" method="post">
@@ -555,11 +555,12 @@
         requestAnimationFrame(animation);
     }
 
-    function scrollToElementById(id) {
-        const element = document.getElementById(id);
+    function scrollToElementById(elementId) {
+        const element = document.getElementById(elementId);
         if (element) {
             element.scrollIntoView({
-                behavior: 'smooth'
+                behavior: 'smooth',
+                block: 'center'
             });
         }
     }
@@ -583,7 +584,7 @@
                 behavior: 'smooth',
                 block: 'center'
             });
-        }, 300);
+        }, 500);
     }
 
     function hideUpdateKomenForm(KomenId) {
@@ -596,7 +597,7 @@
                 behavior: 'smooth',
                 block: 'start'
             });
-        }, 300);
+        }, 500);
     }
 
     function confirmDelete(komenId) {
@@ -609,7 +610,7 @@
                     behavior: 'smooth',
                     block: 'start'
                 });
-            }, 300);
+            }, 500);
         }
     }
 
@@ -623,7 +624,7 @@
                 behavior: 'smooth',
                 block: 'start'
             });
-        }, 300);
+        }, 500);
     }
 
     function confirmDeleteReply(replyId) {
@@ -636,7 +637,7 @@
                     behavior: 'smooth',
                     block: 'start'
                 });
-            }, 300);
+            }, 500);
         }
     }
 
@@ -661,12 +662,20 @@
                 behavior: 'smooth',
                 block: 'center'
             });
-        }, 300);
+        }, 500);
     }
 
     function hideReplyForm(komenId) {
         var form = document.getElementById('reply-form-' + komenId);
         form.style.display = 'none';
+
+        setTimeout(function () {
+            var commentSection = document.getElementById('comments-section');
+            commentSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 100);
     }
 
     function cancelUpdateForm(komenId) {
@@ -689,10 +698,10 @@
         scrollToElementById(scrollTo);
     }
 
-    window.onload = function() {
-        if(window.location.hash) {
+    window.onload = function () {
+        if (window.location.hash) {
             var targetElement = document.querySelector(window.location.hash);
-            if(targetElement) {
+            if (targetElement) {
                 targetElement.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'

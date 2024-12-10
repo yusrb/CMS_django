@@ -256,13 +256,14 @@ class KomunitasListView(ListView):
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
-        context["komunitass"] = Komunitas.objects.all()
+        context["komunitass"] = Komunitas.objects.filter(status=True)
         context["design_user"] = get_object_or_404(User, pk=1)
 
         search_input = self.request.GET.get('q', '')
         context['search_input'] = search_input
 
         return context
+
 class KomunitasDetailView(DetailView):
     model = Komunitas
     template_name = "user/Komunitas/komunitas_detail.html"
@@ -295,7 +296,7 @@ class KomunitasDetailView(DetailView):
 
 def KomunitasJoinView(request, pk):
     if not request.user.is_authenticated:
-        messages.error(request, "Anda perlu login terlebih dahulu untuk bergabung dengan komunitas.")
+        messages.success(request, "Anda perlu login terlebih dahulu untuk bergabung dengan komunitas.")
         return redirect('user:user_login')
 
     komunitas = get_object_or_404(Komunitas, pk=pk)

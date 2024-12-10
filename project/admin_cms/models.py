@@ -86,18 +86,18 @@ class Bookmarks(models.Model):
         return f'{self.komunitas.nama} - {self.judul}'
 
 class Komunitas(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default=1)
-    nama = models.CharField(max_length=30)
-    deskripsi = models.TextField()
-    foto_komunitas = models.ImageField(upload_to="komunitas_foto/", blank=True, null=True)
-    tanggal = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.SET_DEFAULT, default=1, null=True, blank=True)
+    nama = models.CharField(max_length=30, null=True, blank=True)
+    deskripsi = models.TextField(null=True, blank=True)
+    foto_komunitas = models.ImageField(upload_to="komunitas_foto/", null=True, blank=True)
+    tanggal = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    
+    peraturan = models.ManyToManyField('PeraturanKomunitas', related_name='komunitas_peraturan', blank=True)
+    boomark = models.ManyToManyField('Bookmarks', related_name='komunitas_bookmarks', blank=True)
 
-    peraturan = models.ManyToManyField(PeraturanKomunitas, related_name='komunitas_peraturan')
-    boomark = models.ManyToManyField(Bookmarks, related_name='komunitas_bookmarks')
-
-    status = models.BooleanField(default=True)
+    status = models.BooleanField(default=True, null=True, blank=True)
     jumlah_pertanyaan = models.IntegerField(default=0, null=True, blank=True)
-
+    
     members = models.ManyToManyField(User, related_name='komunitas_members', blank=True)
 
     class Meta:
@@ -151,6 +151,8 @@ class KontenDilihat(models.Model):
 class Konfigurasi(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='konfigurasi' , default=1)
     judul_website = models.CharField(max_length=100)
+    favicon = models.ImageField(upload_to="favicon_foto/", null=True)
+
     instagram = models.CharField(max_length=50 , blank=True , null=True)
     facebook = models.CharField(max_length=50 , blank=True , null=True)
     x = models.CharField(max_length=50 , blank=True , null=True)

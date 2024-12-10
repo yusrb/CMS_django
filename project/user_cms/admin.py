@@ -44,7 +44,7 @@ class AktivitasAdmin(admin.ModelAdmin):
 # ===============================
 
 class KontenAdmin(admin.ModelAdmin):
-    list_display = ('judul', 'kategori', 'formatted_tanggal')
+    list_display = ('judul', 'kategori', 'formatted_tanggal','user')
     search_fields = ('judul',)
     exclude = ('username', 'user', 'slug', 'dilihat')
 
@@ -140,8 +140,6 @@ class KomunitasAdmin(admin.ModelAdmin):
     readonly_fields = ['jumlah_pertanyaan']
     ordering = ('-tanggal',)
 
-    # inlines = [PeraturanKomunitasInline, BookmarksInline]
-
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs if request.user.is_superuser else qs.filter(user=request.user)
@@ -149,7 +147,6 @@ class KomunitasAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             obj.user = request.user
-            obj.username = request.user.username
         super().save_model(request, obj, form, change)
 
     def has_add_permission(self, request):
@@ -158,17 +155,17 @@ class KomunitasAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         if obj:
             return obj.user == request.user or request.user.is_superuser
-        return True
+        return request.user.is_superuser
 
     def has_delete_permission(self, request, obj=None):
         if obj:
             return obj.user == request.user or request.user.is_superuser
-        return True
+        return request.user.is_superuser
 
     def has_view_permission(self, request, obj=None):
         if obj:
             return obj.user == request.user or request.user.is_superuser
-        return True
+        return request.user.is_superuser
 
 # ===============================
 # Pertanyaan Admin
