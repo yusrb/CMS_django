@@ -14,7 +14,7 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'nama', 'email', 'level')
     search_fields = ('username', 'email', 'nama')
     ordering = ('username',)
-    
+
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('nama', 'email', 'telepon', 'level')}),

@@ -28,7 +28,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-    
     def save(self, *args, **kwargs):
         try:
             old_instance = User.objects.get(pk=self.pk)
@@ -48,7 +47,6 @@ class User(AbstractUser):
 
         super(User, self).save(*args, **kwargs)
 
-        # Tambahkan izin untuk level User
         if self.level == 'User':
             permissions = [
                 'can_add_konten',
@@ -91,18 +89,26 @@ class Komunitas(models.Model):
     deskripsi = models.TextField(null=True, blank=True)
     foto_komunitas = models.ImageField(upload_to="komunitas_foto/", null=True, blank=True)
     tanggal = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    
+
     peraturan = models.ManyToManyField('PeraturanKomunitas', related_name='komunitas_peraturan', blank=True)
     boomark = models.ManyToManyField('Bookmarks', related_name='komunitas_bookmarks', blank=True)
 
     status = models.BooleanField(default=True, null=True, blank=True)
     jumlah_pertanyaan = models.IntegerField(default=0, null=True, blank=True)
-    
+
     members = models.ManyToManyField(User, related_name='komunitas_members', blank=True)
 
     class Meta:
         verbose_name = "Komunitas"
         verbose_name_plural = "Komunitas"
+        ordering = ['nama']
+
+        permissions = [
+            ("can_add_konten", "Can add konten"),
+            ("can_change_konten", "Can change konten"),
+            ("can_delete_konten", "Can delete konten"),
+            ("can_view_konten", "Can view konten"),
+        ]
 
     def update_pertanyaan_count(self):
         self.jumlah_pertanyaan = self.pertanyaan_set.count()

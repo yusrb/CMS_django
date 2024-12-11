@@ -4,16 +4,16 @@
 
 {% block content %}
 {% include 'snippets/nav.html' %}
-<div class="container-fluid mt-5 pt-3">
+<div class="container-fluid lg:mt-5 pt-3">
     <div class="container">
         <div class="row">
             <!-- Komunitas Detail Start -->
-            <div class="w-[66.6%]">
+            <div class="w-[100%] lg:w-[66.6%]">
                 <!-- Header Section -->
                 <div class="section-title mb-3 text-center skew-x-2">
                     <h4 class="m-0 text-uppercase font-weight-bold">{{komunitas.nama}}</h4>
                     <a class="text-secondary font-weight-medium text-decoration-none"
-                        href="{% url 'user:komunitas_list' %}">Kembali ke Home</a>
+                        href="{% url 'user:komunitas_list' %}">Kembali</a>
                 </div>
 
                 <!-- Modal Error -->
@@ -53,7 +53,7 @@
                             {% endif %}
                         </div>
                         <p class="text-left mt-3 text-muted">
-                            {{ komunitas.deskripsi|truncatewords:40 }}
+                            {{ komunitas.deskripsi }}
                         </p>
                     </div>
                 </div>
@@ -61,7 +61,8 @@
                 <!-- Pertanyaan Section -->
                 <div class="card shadow-sm mb-4" id="pertanyaan-list">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="font-weight-bold m-0"><i class="fas fa-question-circle"></i> Diskusi Komunitas
+                        <h5 class="font-weight-bold m-0 text-lg sm:text-base md:text-lg">
+                            <i class="fas fa-question-circle"></i> Diskusi Komunitas
                         </h5>
                     </div>
                     <div class="card-body">
@@ -96,8 +97,8 @@
                                     </form>
                                 </div>
                                 {% endif %}
-                                <h6 class="font-weight-bold mt-1">{{ pertanyaan.judul }}</h6>
-                                <p class="text-muted">{{ pertanyaan.isi|truncatewords:30 }}</p>
+                                <h6 class="font-weight-bold mt-1 text-xl sm:text-lg md:text-xl">{{ pertanyaan.judul }}</h6>
+                                <p class="text-justify w-full sm:w-[90%] md:w-[90%]">{{ pertanyaan.isi|truncatewords:30 }}</p>
                                 <small class="text-muted d-block">
                                     <div class="d-flex align-items-center">
                                         {% if pertanyaan.penulis.pk == request.user.pk %}
@@ -111,351 +112,431 @@
                                                 src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
                                                 width="25" height="25" alt="Default Profile Picture">
                                             {% endif %}
-                                            <span class="font-semibold relative">{{ pertanyaan.penulis.username }}</span>
-                                        </a>
-                                        {% else %}
-                                        <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
-                                            class="d-flex align-items-center">
-                                            {% if pertanyaan.penulis.foto %}
-                                            <img class="rounded-circle mr-2" src="{{ pertanyaan.penulis.foto.url }}"
-                                                width="25" height="25" alt="{{ pertanyaan.penulis.username }}">
-                                            {% else %}
-                                            <img class="rounded-circle mr-2"
-                                                src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-                                                width="25" height="25" alt="Default Profile Picture">
+                                            <span
+                                                class="font-semibold relative">{{ pertanyaan.penulis.username }}</span>
+                                            </a>
+                                            <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
+                                                class="d-flex align-items-center">
+                                                {% if pertanyaan.penulis.foto %}
+                                                <img class="rounded-circle mr-2" src="{{ pertanyaan.penulis.foto.url }}"
+                                                    width="25" height="25" alt="{{ pertanyaan.penulis.username }}">
+                                                {% else %}
+                                                <img class="rounded-circle mr-2"
+                                                    src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                                                    width="25" height="25" alt="Default Profile Picture">
+                                                {% endif %}
+                                                <span
+                                                    class="font-semibold relative right-[3px]">{{ pertanyaan.penulis.username }}</span>
+                                            </a>
                                             {% endif %}
-                                            <span class="font-semibold relative right-[3px]">{{ pertanyaan.penulis.username }}</span>
-                                        </a>
-                                        {% endif %}
 
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-clock ml-[12px]"></i>
-                                            <p class="ml-1 mb-0">{{ pertanyaan.created_at|timesince }} ago</p>
-                                        </div>
-                                    </div>
-                                </small>
-
-                                <!-- Lihat Jawaban -->
-                                <button class="btn btn-warning btn-sm mt-3" data-bs-toggle="modal"
-                                    data-bs-target="#jawabanModal-{{ pertanyaan.id }}">Lihat Jawaban</button>
-
-                                <!-- Modal Jawaban -->
-                                <div class="modal fade" id="jawabanModal-{{ pertanyaan.id }}" tabindex="1"
-                                    aria-labelledby="jawabanModalLabel-{{ pertanyaan.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-lg rounded">
-                                        <div class="modal-content bg-light border-0 rounded">
-                                            <div class="modal-header bg-warning text-dark">
-                                                <h5 class="modal-title" id="jawabanModalLabel-{{ pertanyaan.id }}">
-                                                    Jawaban untuk: {{ pertanyaan.judul }}
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-clock ml-[12px]"></i>
+                                                <p class="ml-1 mb-0">{{ pertanyaan.created_at|timesince }} ago</p>
                                             </div>
+                                            </div>
+                                            </small>
 
-                                            <!-- Modal Body -->
-                                            <div class="modal-body">
-                                                <!-- Pertanyaan -->
-                                                <div class="mb-4">
-                                                    <h4 class="text-dark fw-bold mb-2">{{ pertanyaan.judul }}
-                                                    </h4>
-                                                    <p class="text-dark mb-2">{{ pertanyaan.isi }}</p>
+                                            <!-- Lihat Jawaban -->
+                                            <button class="btn btn-warning btn-sm mt-3" data-bs-toggle="modal"
+                                                data-bs-target="#jawabanModal-{{ pertanyaan.id }}">Lihat
+                                                Jawaban</button>
 
-                                                    <p class="text-muted small d-flex align-items-center">
-                                                        <!-- Foto Profil Penulis -->
-                                                        {% if pertanyaan.penulis.foto %}
-                                                        <a href="{% url 'user:user_profil' pertanyaan.penulis.pk %}"
-                                                            class="d-flex align-items-center">
-                                                            <img class="rounded-circle me-2 ml-1"
-                                                                src="{{ pertanyaan.penulis.foto.url }}" width="25"
-                                                                height="25" alt="{{ pertanyaan.penulis.username }}">
-                                                        </a>
-                                                        {% else %}
-                                                        <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
-                                                            class="d-flex align-items-center">
-                                                            <img class="rounded-circle me-2 ml-1"
-                                                                src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-                                                                width="25" height="25" alt="Default Profile Picture">
-                                                        </a>
-                                                        {% endif %}
-                                                        <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
-                                                            class="font-semibold">
-                                                            {{ pertanyaan.penulis.username }}
-                                                        </a>
-                                                        <span class="d-flex align-items-center">
-                                                            <i class="fas fa-clock ms-3"></i>
-                                                            <span class="ml-1">{{ pertanyaan.created_at|timesince }}
-                                                                ago</span>
-                                                        </span>
-                                                    </p>
-                                                </div>
+                                            <!-- Modal Jawaban -->
+                                            <div class="modal fade" id="jawabanModal-{{ pertanyaan.id }}" tabindex="1"
+                                                aria-labelledby="jawabanModalLabel-{{ pertanyaan.id }}"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg rounded">
+                                                    <div class="modal-content bg-light border-0 rounded">
+                                                        <div class="modal-header bg-warning text-dark">
+                                                            <h5 class="modal-title"
+                                                                id="jawabanModalLabel-{{ pertanyaan.id }}">
+                                                                Jawaban untuk: {{ pertanyaan.judul }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
 
-                                                <hr class="my-3">
+                                                        <!-- Modal Body -->
+                                                        <div class="modal-body">
+                                                            <!-- Pertanyaan -->
+                                                            <div class="mb-4">
+                                                                <h4 class="text-dark fw-bold mb-2">
+                                                                    {{ pertanyaan.judul }}
+                                                                </h4>
+                                                                <p class="text-dark mb-2">{{ pertanyaan.isi }}</p>
 
-                                                <!-- Jawaban Section -->
-                                                <h5 class="font-bold text-xl text-center mb-3">Jawaban</h5>
-                                                <div id="jawaban-list-{{ pertanyaan.id }}" class="mb-4">
-                                                    {% for jawaban in pertanyaan.jawaban_set.all %}
-                                                    <div class="alert bg-white border p-3 mb-3 rounded position-relative shadow-sm">
-                                                        {% if jawaban.penulis == request.user %}
-                                                        <div class="position-absolute top-0 end-0 mt-2 me-2">
-                                                            <div class="dropdown">
-                                                                <button class="btn btn-sm text-dark" type="button" id="dropdownMenuButtonJawaban-{{ jawaban.id }}"
-                                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <i class="fas fa-ellipsis-v"></i>
-                                                                </button>
-                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonJawaban-{{ jawaban.id }}">
-                                                                    <li>
-                                                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#updateJawabanModal-{{ jawaban.id }}">
-                                                                            <i class="bi bi-pencil-square"></i> Edit
-                                                                        </a>
-                                                                    </li>
-
-                                                                    <li>
-                                                                        <a class="dropdown-item text-danger" href="#" onclick="confirmDeleteJawaban({{ jawaban.id }})">
-                                                                            <i class="bi bi-trash"></i> Hapus
-                                                                        </a>
-                                                                    </li>
-
-                                                                    <form id="delete-form-jawaban-{{ jawaban.id }}" method="post" action="{% url 'user:jawab_pertanyaan_delete' pertanyaan.id jawaban.id %}" style="display: none;">
-                                                                        {% csrf_token %}
-                                                                    </form>
-                                                                </ul>
+                                                                <p class="text-muted small d-flex align-items-center">
+                                                                    <!-- Foto Profil Penulis -->
+                                                                    {% if pertanyaan.penulis.foto %}
+                                                                    <a href="{% url 'user:user_profil' pertanyaan.penulis.pk %}"
+                                                                        class="d-flex align-items-center">
+                                                                        <img class="rounded-circle me-2 ml-1"
+                                                                            src="{{ pertanyaan.penulis.foto.url }}"
+                                                                            width="25" height="25"
+                                                                            alt="{{ pertanyaan.penulis.username }}">
+                                                                    </a>
+                                                                    {% else %}
+                                                                    <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
+                                                                        class="d-flex align-items-center">
+                                                                        <img class="rounded-circle me-2 ml-1"
+                                                                            src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                                                                            width="25" height="25"
+                                                                            alt="Default Profile Picture">
+                                                                    </a>
+                                                                    {% endif %}
+                                                                    <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
+                                                                        class="font-semibold">
+                                                                        {{ pertanyaan.penulis.username }}
+                                                                    </a>
+                                                                    <span class="d-flex align-items-center">
+                                                                        <i class="fas fa-clock ms-3"></i>
+                                                                        <span
+                                                                            class="ml-1">{{ pertanyaan.created_at|timesince }}
+                                                                            ago</span>
+                                                                    </span>
+                                                                </p>
                                                             </div>
+
+                                                            <hr class="my-3">
+
+                                                            <!-- Jawaban Section -->
+                                                            <h1 class="font-bold text-xl text-center mb-3">Jawaban</h1>
+                                                            <div id="jawaban-list-{{ pertanyaan.id }}" class="mb-4">
+                                                                {% if pertanyaan.jawaban_set.count == 0 %}
+                                                                <p class="text-muted text-center">Belum ada jawaban
+                                                                    untuk
+                                                                    pertanyaan ini.</p>
+                                                                {% else %}
+                                                                {% for jawaban in pertanyaan.jawaban_set.all %}
+                                                                <div
+                                                                    class="alert bg-white border p-3 mb-3 rounded position-relative shadow-sm">
+                                                                    {% if jawaban.penulis == request.user %}
+                                                                    <div
+                                                                        class="position-absolute top-0 end-0 mt-2 me-2">
+                                                                        <div class="dropdown">
+                                                                            <button class="btn btn-sm text-dark"
+                                                                                type="button"
+                                                                                id="dropdownMenuButtonJawaban-{{ jawaban.id }}"
+                                                                                data-bs-toggle="dropdown"
+                                                                                aria-expanded="false">
+                                                                                <i class="fas fa-ellipsis-v"></i>
+                                                                            </button>
+                                                                            <ul class="dropdown-menu"
+                                                                                aria-labelledby="dropdownMenuButtonJawaban-{{ jawaban.id }}">
+                                                                                <li>
+                                                                                    <a class="dropdown-item" href="#"
+                                                                                        data-bs-toggle="modal"
+                                                                                        data-bs-target="#updateJawabanModal-{{ jawaban.id }}">
+                                                                                        <i
+                                                                                            class="bi bi-pencil-square"></i>
+                                                                                        Edit
+                                                                                    </a>
+                                                                                </li>
+
+                                                                                <li>
+                                                                                    <a class="dropdown-item text-danger"
+                                                                                        href="#"
+                                                                                        onclick="confirmDeleteJawaban({{ jawaban.id }})">
+                                                                                        <i class="bi bi-trash"></i>
+                                                                                        Hapus
+                                                                                    </a>
+                                                                                </li>
+
+                                                                                <form
+                                                                                    id="delete-form-jawaban-{{ jawaban.id }}"
+                                                                                    method="post"
+                                                                                    action="{% url 'user:jawab_pertanyaan_delete' pertanyaan.id jawaban.id %}"
+                                                                                    style="display: none;">
+                                                                                    {% csrf_token %}
+                                                                                </form>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    {% endif %}
+                                                                    <div class="d-flex align-items-center mb-2">
+                                                                        {% if jawaban.penulis.foto %}
+                                                                        <a href="{% url 'user:user_profil' jawaban.penulis.pk %}"
+                                                                            class="d-flex align-items-center me-2">
+                                                                            <img class="rounded-circle"
+                                                                                src="{{ jawaban.penulis.foto.url }}"
+                                                                                width="25" height="25"
+                                                                                alt="{{ jawaban.penulis.username }}">
+                                                                        </a>
+                                                                        {% else %}
+                                                                        <a href="{% url 'user:user_detail' jawaban.penulis.pk %}"
+                                                                            class="d-flex align-items-center me-2">
+                                                                            <img class="rounded-circle"
+                                                                                src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                                                                                width="25" height="25"
+                                                                                alt="Default Profile Picture">
+                                                                        </a>
+                                                                        {% endif %}
+                                                                        <a href="{% url 'user:user_profil' jawaban.penulis.pk %}"
+                                                                            class="font-semibold me-2">{{ jawaban.penulis.username }}</a>
+                                                                        <small
+                                                                            class="text-muted">{{ jawaban.created_at|timesince }}
+                                                                            ago</small>
+                                                                    </div>
+                                                                    <p class="text-dark text-justify w-[96%] mt-2">
+                                                                        {{ jawaban.isi|linebreaksbr }}</p>
+                                                                </div>
+                                                                {% endfor %}
+                                                                {% endif %}
+                                                            </div>
+
+                                                            <!-- Form Jawaban -->
+                                                            <form
+                                                                action="{% url 'user:jawab_pertanyaan' pertanyaan_id=pertanyaan.id %}"
+                                                                method="post">
+                                                                {% csrf_token %}
+                                                                <div class="form-group mb-3">
+                                                                    <label for="jawaban-{{ pertanyaan.id }}"
+                                                                        class="form-label font-bold text-gray-800">Jawaban
+                                                                        Anda</label>
+                                                                    <textarea name="isi" class="form-control" rows="12"
+                                                                        cols="82"
+                                                                        placeholder="Tulis jawaban Anda di sini..."
+                                                                        required></textarea>
+                                                                </div>
+                                                                <button type="submit"
+                                                                    class="btn btn-warning btn-sm">Kirim
+                                                                    Jawaban</button>
+                                                            </form>
                                                         </div>
-                                                        {% endif %}
-                                                        <div class="d-flex align-items-center mb-2">
-                                                            {% if jawaban.penulis.foto %}
-                                                            <a href="{% url 'user:user_profil' jawaban.penulis.pk %}" class="d-flex align-items-center me-2">
-                                                                <img class="rounded-circle" src="{{ jawaban.penulis.foto.url }}" width="25" height="25" alt="{{ jawaban.penulis.username }}">
-                                                            </a>
-                                                            {% else %}
-                                                            <a href="{% url 'user:user_detail' jawaban.penulis.pk %}" class="d-flex align-items-center me-2">
-                                                                <img class="rounded-circle" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" width="25" height="25" alt="Default Profile Picture">
-                                                            </a>
-                                                            {% endif %}
-                                                            <a href="{% url 'user:user_profil' jawaban.penulis.pk %}" class="font-semibold me-2">{{ jawaban.penulis.username }}</a>
-                                                            <small class="text-muted">{{ jawaban.created_at|timesince }} yang lalu</small>
-                                                        </div>
-                                                        <p class="text-dark mt-2">{{ jawaban.isi }}</p>
                                                     </div>
-                                                    {% endfor %}
                                                 </div>
+                                            </div>
 
-                                                <!-- Form Jawaban -->
-                                                <form
-                                                    action="{% url 'user:jawab_pertanyaan' pertanyaan_id=pertanyaan.id %}"
-                                                    method="post">
-                                                    {% csrf_token %}
-                                                    <div class="form-group mb-3">
-                                                        <label for="jawaban-{{ pertanyaan.id }}"
-                                                            class="form-label font-bold text-gray-800">Jawaban
-                                                            Anda</label>
-                                                        <textarea name="isi" class="form-control" rows="3"
-                                                            placeholder="Tulis jawaban Anda di sini..."
-                                                            required></textarea>
+
+                                            <!-- Modal Update Jawaban -->
+                                            {% for jawaban in pertanyaan.jawaban_set.all %}
+                                            <div class="modal fade" id="updateJawabanModal-{{ jawaban.id }}"
+                                                tabindex="-1" aria-labelledby="updateJawabanModalLabel-{{ jawaban.id }}"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-lg rounded">
+                                                    <div class="modal-content bg-light border-0 rounded">
+                                                        <div class="modal-header bg-warning text-dark">
+                                                            <h5 class="modal-title"
+                                                                id="updateJawabanModalLabel-{{ jawaban.id }}">
+                                                                Update Jawaban untuk: {{ jawaban.pertanyaan.judul }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form
+                                                                action="{% url 'user:jawab_pertanyaan_update' pertanyaan_id=pertanyaan.id jawaban_id=jawaban.id %}"
+                                                                method="post">
+                                                                {% csrf_token %}
+                                                                <div class="form-group">
+                                                                    <label for="jawaban-{{ jawaban.id }}">Jawaban
+                                                                        Anda</label>
+                                                                    <textarea name="isi" class="form-control" rows="20"
+                                                                        cols="82" required>{{ jawaban.isi }}</textarea>
+                                                                </div>
+                                                                <button type="submit"
+                                                                    class="btn btn-warning btn-sm mt-3">Update
+                                                                    Jawaban</button>
+                                                            </form>
+                                                        </div>
                                                     </div>
-                                                    <button type="submit" class="btn btn-warning btn-sm">Kirim
-                                                        Jawaban</button>
-                                                </form>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                            {% endfor %}
 
-                                <!-- Modal Update Jawaban -->
-                                {% for jawaban in pertanyaan.jawaban_set.all %}
-                                <div class="modal fade" id="updateJawabanModal-{{ jawaban.id }}" tabindex="-1"
-                                    aria-labelledby="updateJawabanModalLabel-{{ jawaban.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered modal-lg rounded">
-                                        <div class="modal-content bg-light border-0 rounded">
-                                            <div class="modal-header bg-warning text-dark">
-                                                <h5 class="modal-title" id="updateJawabanModalLabel-{{ jawaban.id }}">
-                                                    Update Jawaban untuk: {{ jawaban.pertanyaan.judul }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
+                                            <div id="jawaban-result-{{ pertanyaan.id }}" class="mt-3"></div>
+
+                                            <!-- form Update Pertanyaan -->
+                                            <div id="update-form-{{ pertanyaan.id }}" class="update-form mt-3"
+                                                style="display:none;">
                                                 <form
-                                                    action="{% url 'user:jawab_pertanyaan_update' pertanyaan_id=pertanyaan.id jawaban_id=jawaban.id %}"
+                                                    action="{% url 'user:pertanyaan_komunitas_update' pertanyaan_id=pertanyaan.id %}"
                                                     method="post">
                                                     {% csrf_token %}
                                                     <div class="form-group">
-                                                        <label for="jawaban-{{ jawaban.id }}">Jawaban Anda</label>
-                                                        <textarea name="isi" class="form-control" rows="3"
-                                                            required>{{ jawaban.isi }}</textarea>
+                                                        <label for="judul">Judul Pertanyaan</label>
+                                                        <input type="text" name="judul" class="form-control"
+                                                            value="{{ pertanyaan.judul }}" required>
                                                     </div>
-                                                    <button type="submit" class="btn btn-warning btn-sm mt-3">Update
-                                                        Jawaban</button>
+                                                    <div class="form-group">
+                                                        <label for="isi">Isi Pertanyaan</label>
+                                                        <textarea name="isi" class="form-control" rows="3"
+                                                            required>{{ pertanyaan.isi }}</textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="hideUpdatePertanyaanForm({{ pertanyaan.id }})">Batal</button>
                                                 </form>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-
-                                <div id="jawaban-result-{{ pertanyaan.id }}" class="mt-3"></div>
-
-                                <!-- form Update Pertanyaan -->
-                                <div id="update-form-{{ pertanyaan.id }}" class="update-form mt-3"
-                                    style="display:none;">
-                                    <form action="{% url 'user:pertanyaan_komunitas_update' pertanyaan_id=pertanyaan.id %}" method="post">
-                                        {% csrf_token %}
-                                        <div class="form-group">
-                                            <label for="judul">Judul Pertanyaan</label>
-                                            <input type="text" name="judul" class="form-control" value="{{ pertanyaan.judul }}" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="isi">Isi Pertanyaan</label>
-                                            <textarea name="isi" class="form-control" rows="3" required>{{ pertanyaan.isi }}</textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
-                                        <button type="button" class="btn btn-danger btn-sm" onclick="hideUpdatePertanyaanForm({{ pertanyaan.id }})">Batal</button>
-                                    </form>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <p class="text-muted">Belum ada pertanyaan di komunitas ini.</p>
-                        {% endif %}
-                    </div>
-
-                </div>
-
-                <div class="card shadow-sm">
-                    <div class="card-header bg-warning text-white">
-                        <h5 class="font-weight-bold m-0"><i class="fas fa-plus-circle"></i> Buat Pertanyaan Baru</h5>
-                    </div>
-                    <div class="card-body">
-                        <form action="{% url 'user:pertanyaan_komunitas_create' komunitas_id=komunitas.id %}"
-                            method="post">
-                            {% csrf_token %}
-                            {{ form|crispy }}
-                            <button type="submit"
-                                class="w-full py-2 bg-yellow-400 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
-                                Kirim Pertanyaan
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <!-- Komunitas Detail End -->
-
-            <!-- Sidebar -->
-            <div class="w-[30.3%] left-2 relative">
-                <div class="card shadow-lg rounded-lg border border-z-300">
-                    <div class="section-title text-white">
-                        <h5 class="font-semibold text-xl relative top-1">Informasi Komunitas</h5>
-                    </div>
-                    <div class="card-body text-sm">
-                        <div class="flex flex-col lg:flex-row lg:gap-8">
-                            <div class="flex-1">
-                                <ul class="space-y-4">
-                                    <li>
-                                        <strong>Pembuat:</strong>
-                                        <p>{{ komunitas.user.username }}</p>
-                                    </li>
-                                    <li>
-                                        <strong>Dibuat pada:</strong>
-                                        <p>{{ komunitas.tanggal|date:"d, M Y" }}</p>
-                                    </li>
-                                    <li>
-                                        <strong>Pengguna Online:</strong>
-                                        <p>{{ users_online }}</p>
-                                    </li>
-                                    <li>
-                                        <strong>Jumlah Anggota:</strong>
-                                        <p>{{ komunitas.members.count }}</p>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="flex-1 mt-4 lg:mt-0">
-                                {% if user in komunitas.members.all %}
-                                <button class="px-2 py-2 hover:bg-red-500 relative top-40 left-4 rounded text-gray-400 hover:text-white text-[10px] font-semibold mt-1"
-                                    data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">
-                                    Keluar dari Komunitas
-                                </button>
-
-                                <!-- Modal Confirm Keluar -->
-                                <div class="modal fade" id="confirmLeaveModal" tabindex="-1" aria-labelledby="confirmLeaveModalLabel"
-                                    aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header bg-warning">
-                                                <h5 class="modal-title" id="confirmLeaveModalLabel">Konfirmasi Keluar</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body">
-                                                Apakah Anda yakin ingin keluar dari komunitas {{ komunitas.nama }}?
+                                            {% endfor %}
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                                <form method="post" action="{% url 'user:komunitas_keluar' komunitas.pk %}" class="d-inline">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn btn-danger">Ya, Keluar</button>
-                                                </form>
+                                            {% else %}
+                                            <p class="text-muted">Belum ada pertanyaan di komunitas ini.</p>
+                                            {% endif %}
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% else %}
-                                <form method="post" action="{% url 'user:komunitas_join' komunitas.pk %}" class="mt-4">
-                                    {% csrf_token %}
-                                    <button type="submit"
-                                        class="px-1 py-1 relative top-32 left-2 bg-gradient-to-br from-[#FBC02D] to-[#FF9800] w-full rounded-md text-[10px] text-white font-semibold transition-all duration-300 hover:from-[#FFEB3B] hover:to-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FF7043] shadow-sm hover:shadow-sm">
-                                        Bergabung dengan Komunitas
-                                    </button>
-                                </form>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="card mt-6">
-                    <div class="section-title text-white">
-                        <h5 class="font-semibold text-xl relative top-1">Bookmarks Komunitas</h5>
-                    </div>
-                    <div class="card-body">
-                        <ul class="space-y-2">
-                            {% for bookmark in bookmarks %}
-                            <li>
-                                <a href="{{ bookmark.url_link }}" target="_blank"
-                                    class="text-lg font-extrabold text-gray-600 hover:text-gray-800">
-                                    {{ bookmark.judul }}
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
+                                            </div>
 
-                <div class="card mt-6">
-                    <div class="section-title text-white">
-                        <h5 class="font-semibold text-xl relative top-1">Peraturan Komunitas</h5>
-                    </div>
-                    <div class="card-body text-sm">
-                        <ul class="space-y-3">
-                            {% for peraturan in peraturans %}
-                            <li>
-                                <button
-                                    class="text-left w-full font-bold text-gray-600 hover:text-gray-800 flex items-center justify-between"
-                                    onclick="toggleDescription('{{ peraturan.id }}')">
-                                    <span>{{ peraturan.judul }}</span>
-                                    <i id="arrow-{{ peraturan.id }}" class="fas fa-chevron-down"></i>
-                                </button>
+                                            <div class="card shadow-sm">
+                                                <div class="card-header bg-warning text-white">
+                                                    <h5 class="font-weight-bold m-0"><i class="fas fa-plus-circle"></i>
+                                                        Buat Pertanyaan Baru</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <form
+                                                        action="{% url 'user:pertanyaan_komunitas_create' komunitas_id=komunitas.id %}"
+                                                        method="post">
+                                                        {% csrf_token %}
+                                                        {{ form|crispy }}
+                                                        <button type="submit"
+                                                            class="w-full py-2 bg-yellow-400 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all">
+                                                            Kirim Pertanyaan
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            </div>
+                                            <!-- Komunitas Detail End -->
 
-                                <div id="desc-{{ peraturan.id }}" class="text-[11.8px] text-gray-600 hidden mt-2">
-                                    {{ peraturan.deskripsi }}
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
+                                            <!-- Sidebar -->
+                                            <div class="w-[100%] lg:w-[30.3%] left-2 relative">
+                                                <div class="card shadow-lg rounded-lg border border-z-300">
+                                                    <div class="section-title text-white">
+                                                        <h5
+                                                            class="font-semibold text-xl sm:text-lg md:text-xl relative top-1">
+                                                            Informasi Komunitas</h5>
+                                                    </div>
+                                                    <div class="card-body text-sm">
+                                                        <div class="flex flex-col lg:flex-row lg:gap-8">
+                                                            <div class="flex-1">
+                                                                <ul class="space-y-4">
+                                                                    <li>
+                                                                        <strong>Pembuat:</strong>
+                                                                        <p>{{ komunitas.user.username }}</p>
+                                                                    </li>
+                                                                    <li>
+                                                                        <strong>Dibuat pada:</strong>
+                                                                        <p>{{ komunitas.tanggal|date:"d, M Y" }}</p>
+                                                                    </li>
+                                                                    <li>
+                                                                        <strong>Pengguna Online:</strong>
+                                                                        <p>{{ users_online }}</p>
+                                                                    </li>
+                                                                    <li>
+                                                                        <strong>Jumlah Anggota:</strong>
+                                                                        <p>{{ komunitas.members.count }}</p>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <div class="flex-1 mt-4 lg:mt-0">
+                                                                {% if user in komunitas.members.all %}
+                                                                <button
+                                                                    class="px-2 py-2 hover:bg-red-500 relative top-40 left-4 rounded text-gray-400 hover:text-white text-[10px] font-semibold mt-1"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#confirmLeaveModal">
+                                                                    Keluar dari Komunitas
+                                                                </button>
+
+                                                                <!-- Modal Confirm Keluar -->
+                                                                <div class="modal fade" id="confirmLeaveModal"
+                                                                    tabindex="-1"
+                                                                    aria-labelledby="confirmLeaveModalLabel"
+                                                                    aria-hidden="true">
+                                                                    <div class="modal-dialog">
+                                                                        <div class="modal-content">
+                                                                            <div class="modal-header bg-warning">
+                                                                                <h5 class="modal-title"
+                                                                                    id="confirmLeaveModalLabel">
+                                                                                    Konfirmasi Keluar</h5>
+                                                                                <button type="button" class="btn-close"
+                                                                                    data-bs-dismiss="modal"
+                                                                                    aria-label="Close"></button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                Apakah Anda yakin ingin keluar dari
+                                                                                komunitas {{ komunitas.nama }}?
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button"
+                                                                                    class="btn btn-secondary"
+                                                                                    data-bs-dismiss="modal">Batal</button>
+                                                                                <form method="post"
+                                                                                    action="{% url 'user:komunitas_keluar' komunitas.pk %}"
+                                                                                    class="d-inline">
+                                                                                    {% csrf_token %}
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-danger">Ya,
+                                                                                        Keluar</button>
+                                                                                </form>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                {% else %}
+                                                                <form method="post"
+                                                                    action="{% url 'user:komunitas_join' komunitas.pk %}"
+                                                                    class="mt-4">
+                                                                    {% csrf_token %}
+                                                                    <button type="submit"
+                                                                        class="px-1 py-1 relative top-32 left-2 bg-gradient-to-br from-[#FBC02D] to-[#FF9800] w-full rounded-md text-[10px] text-white font-semibold transition-all duration-300 hover:from-[#FFEB3B] hover:to-[#FFC107] focus:outline-none focus:ring-2 focus:ring-[#FF7043] shadow-sm hover:shadow-sm">
+                                                                        Bergabung dengan Komunitas
+                                                                    </button>
+                                                                </form>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card mt-6">
+                                                    <div class="section-title text-white">
+                                                        <h5
+                                                            class="font-semibold text-xl sm:text-lg md:text-xl relative top-1">
+                                                            Bookmarks Komunitas</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <ul class="space-y-2">
+                                                            {% for bookmark in bookmarks %}
+                                                            <li>
+                                                                <a href="{{ bookmark.url_link }}" target="_blank"
+                        class="text-lg font-extrabold text-gray-600 hover:text-gray-800">
+                        {{ bookmark.judul }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mt-6">
+        <div class="section-title text-white">
+            <h5 class="font-semibold text-xl sm:text-lg md:text-xl relative top-1">Peraturan Komunitas</h5>
+        </div>
+        <div class="card-body text-sm">
+            <ul class="space-y-3">
+                {% for peraturan in peraturans %}
+                <li>
+                    <button
+                        class="text-left w-full font-bold text-gray-600 hover:text-gray-800 flex items-center justify-between"
+                        onclick="toggleDescription('{{ peraturan.id }}')">
+                        <span>{{ peraturan.judul }}</span>
+                        <i id="arrow-{{ peraturan.id }}" class="fas fa-chevron-down"></i>
+                    </button>
+
+                    <div id="desc-{{ peraturan.id }}" class="text-[11.8px] text-gray-600 hidden mt-2">
+                        {{ peraturan.deskripsi }}
                     </div>
-                </div>
-            </div>
-            <!-- Sidebar End -->
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- Sidebar End -->
+
         </div>
     </div>
 </div>

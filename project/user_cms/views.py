@@ -131,7 +131,7 @@ class UserRegisterView(CreateView):
 
 class UserProfilView(LoginRequiredMixin, DetailView):
     model = User
-    template_name = 'user/user_profil.html'
+    template_name = 'user/User/user_profil.html'
     context_object_name = 'user'
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
@@ -164,7 +164,7 @@ class UserProfilView(LoginRequiredMixin, DetailView):
 
 class UserDetailView(DetailView):
     model = User
-    template_name = 'user/user_detail.html'
+    template_name = 'user/User/user_detail.html'
     context_object_name = 'user'
 
     def get(self, request, *args, **kwargs):
@@ -462,7 +462,7 @@ def JawabanPertanyaanUpdateView(request, pertanyaan_id, jawaban_id):
 
 class ContactView(ListView):
     model = Konfigurasi
-    template_name = 'user/contact.html'
+    template_name = 'user/Kontak/contact.html'
     context_object_name = 'konfigurasi'
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
@@ -471,13 +471,12 @@ class ContactView(ListView):
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
-        # context["konfigurasis"] = Konfigurasi.objects.filter(user = self.request.user)
         context["design_user"] = get_object_or_404(User, pk=1)
         return context
 
 class KontenListView(ListView):
     model = Konten
-    template_name = 'user/konten_list.html'
+    template_name = 'user/Konten/konten_list.html'
     context_object_name = 'kontens'
     paginate_by = 6
 
@@ -525,19 +524,15 @@ class KontenListView(ListView):
 
 class KontenLatestListView(ListView):
     model = Konten
-    template_name = 'user/konten_latest.html'
+    template_name = 'user/Konten/konten_latest.html'
     context_object_name = 'kontens'
     paginate_by = 6
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user_theme_config = User.objects.filter(username=self.request.user.username).first()
-
-        if user_theme_config:
-            context['theme'] = user_theme_config.theme
 
         search_input = self.request.GET.get('q')
-        
+
         if search_input:
             kontens = Konten.objects.filter(judul__icontains=search_input).annotate(
                 total_komentar=Count('komentar') + Count('komentar__replies')
@@ -557,15 +552,14 @@ class KontenLatestListView(ListView):
         context["judul"] = 'Daftar Konten Latest'
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context["kategoris"] = Kategori.objects.all()
-        context["konfigurasis"] = Konfigurasi.objects.filter(user=self.request.user)
         context["konfigurasi_home"] = Konfigurasi.objects.filter(user_id=1).first()
         context["design_user"] = get_object_or_404(User, username=self.request.user.username)
 
         return context
-        
+
 class KontenTanggalListView(ListView):
     model = Konten
-    template_name = 'user/konten_tanggal_list.html'
+    template_name = 'user/Konten/konten_tanggal_list.html'
     context_object_name = 'kontens'
 
     def get_context_data(self, **kwargs):
@@ -605,7 +599,7 @@ class KontenTanggalListView(ListView):
 
 class KategoriListView(ListView):
     model = Kategori
-    template_name = 'user/kategori_list.html'
+    template_name = 'user/Kategori/kategori_list.html'
     context_object_name = 'kategoris'
 
     def get_context_data(self, **kwargs) -> dict:
@@ -640,16 +634,8 @@ class KategoriListView(ListView):
 
 class KategoriDetailView(DetailView):
     model = Kategori
-    template_name = 'user/kategori_detail.html'
+    template_name = 'user/Kategori/kategori_detail.html'
     context_object_name = 'kategori'
-
-    # def get(self, request, *args, **kwargs):
-    #     konfigurasi = Konfigurasi.objects.filter(user=self.request.user).first()
-
-    #     if not konfigurasi or not konfigurasi.alamat:
-    #         return redirect('user:konfigurasi')
-
-    #     return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -659,12 +645,15 @@ class KategoriDetailView(DetailView):
 
         if search_input:
             context['kontens'] = Konten.objects.filter(
+                kategori=kategori_obj,
                 judul__icontains=search_input
             ).annotate(
                 total_komentar=Count('komentar') + Count('komentar__replies')
             ).distinct()
         else:
-            context['kontens'] = Konten.objects.order_by('-tanggal').annotate(
+            context['kontens'] = Konten.objects.filter(
+                kategori=kategori_obj
+            ).order_by('-tanggal').annotate(
                 total_komentar=Count('komentar') + Count('komentar__replies')
             )
 
@@ -675,10 +664,9 @@ class KategoriDetailView(DetailView):
         context["design_user"] = get_object_or_404(User, pk=1)
         context['search_input'] = search_input
         return context
-        
 class KontenDetailView(DetailView):
     model = Konten
-    template_name = 'user/konten_detail.html'
+    template_name = 'user/Konten/konten_detail.html'
     context_object_name = 'konten'
 
     def get(self, request, *args, **kwargs):
@@ -872,7 +860,7 @@ class SaranCreateView(CreateView):
 class KonfigurasiUpdateView(UpdateView):
     model = Konfigurasi
     form_class = KonfigurasiForm
-    template_name = 'user/konfigurasi.html'
+    template_name = 'user/Konfigurasi/konfigurasi.html'
 
     def get(self, request, *args, **kwargs):
         konfigurasi = Konfigurasi.objects.filter(user=request.user).first()

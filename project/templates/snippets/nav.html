@@ -53,7 +53,7 @@
                         <a class="nav-link text-body" href="{{konfigurasi_home.tiktok}}"><small class="fab fa-tiktok"></small></a>
                         {% endif %}
                     </li>
-                    
+
                     <li class="nav-item">
                         {% if request.user.is_authenticated %}
                         <a class="nav-link text-body" href="{% url 'user:user_profil' request.user.pk %}">
@@ -70,7 +70,7 @@
                         {% endif %}
                     </li>
                 </ul>
-                
+
             </nav>
         </div>
     </div>
@@ -84,34 +84,36 @@
 </div>
 
 <!-- Navbar Start -->
-<div class="container-fluid p-0 z-50">
-    <nav class="bg-gray-900 text-white py-2 px-5 z-50">
+<div class="container-fluid p-0">
+    <nav class="bg-dark text-white z-50 relative py-[10px] px-4 py-sm-3 py-md-2">
         <div class="flex justify-between items-center">
-            <a href="index.html" class="block lg:hidden text-primary font-bold text-3xl">
-                Biz<span class="text-white">News</span>
+            <a href="user:konten_list" class="text-primary font-bold text-2xl flex lg:hidden lg:text-3xl">
+                {{konfigurasi_home.judul_website}}<span class="text-white">CMS</span>
             </a>
-            <button class="block lg:hidden focus:outline-none" id="navbar-toggle">
+
+            <!-- Tombol hamburger -->
+            <button class="lg:hidden absolute top-3 right-5 focus:outline-none" id="navbar-toggle">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                 </svg>
             </button>
-            <!-- Navbar content -->
-            <div class="hidden lg:flex w-full justify-between items-center" id="navbar-collapse z-50">
-                <div class="flex space-x-4 z-50">
+
+            <div class="hidden lg:ml-6 lg:flex w-full justify-between items-center" id="navbar-collapse">
+                <div class="hidden lg:flex space-x-4">
                     <a href="{% url 'user:konten_list' %}" class="text-white font-medium hover:text-gray-400">Home</a>
                     <a href="{% url 'user:kategori_list' %}" class="text-white font-medium hover:text-gray-400">Category</a>
                     <a href="{% url 'user:komunitas_list' %}" class="text-white font-medium hover:text-gray-400">Community</a>
                     <a href="{% url 'user:contact' %}" class="text-white font-medium hover:text-gray-400">Contact</a>
                 </div>
                 <!-- Search bar -->
-                <div class="hidden lg:flex items-center w-full max-w-xs">
+                <div class="hidden lg:flex items-center max-w-xs">
                     <form method="get" 
-                    action="{% if request.path == '/' %}
-                                {% url 'user:konten_list' %}
-                            {% elif request.path == '/kategori/' %}
-                                {% url 'user:kategori_list' %}
-                    {% endif %}"
-                    class="flex w-full">
+                        action="{% if request.path == '/' %}
+                                    {% url 'user:konten_list' %}
+                                {% elif request.path == '/kategori/' %}
+                                    {% url 'user:kategori_list' %}
+                        {% endif %}" 
+                        class="flex w-full">
                         <input type="text" id="search-bar" name="q" class="form-input w-full bg-gray-800 text-white border-none focus:ring-0 rounded-l-lg" placeholder="Keyword">
                         <button type="submit" class="bg-primary text-white px-3 rounded-r-lg focus:outline-none">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -122,15 +124,50 @@
                 </div>
             </div>
         </div>
+
+        <div class="hidden lg:hidden mt-2" id="mobile-dropdown">
+            <ul class="bg-gray-800 text-white space-y-2 py-2 px-4 rounded-lg">
+                <li><a href="{% url 'user:konten_list' %}" class="block text-white hover:text-gray-400">Home</a></li>
+                <li><a href="{% url 'user:kategori_list' %}" class="block text-white hover:text-gray-400">Category</a>
+                </li>
+                <li><a href="{% url 'user:komunitas_list' %}" class="block text-white hover:text-gray-400">Community</a>
+                </li>
+                <li><a href="{% url 'user:contact' %}" class="block text-white hover:text-gray-400">Contact</a></li>
+                <li>
+                    {% if request.user.is_authenticated %}
+                    <a class="block text-white hover:text-gray-400" href="{% url 'user:user_profil' request.user.pk %}">
+                        Profil
+                    </a>
+                    {% endif %}
+                </li>
+
+                {% if user.is_authenticated %}
+                    <li>
+                        <form action="{% url 'user:user_logout' %}" method="post">
+                            {% csrf_token %}
+                            <button class="block text-white hover:text-gray-400 w-full text-left">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'user:user_login' %}" class="block text-white hover:text-gray-400 w-full text-left">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+
     </nav>
 </div>
 <!-- Navbar End -->
 
-    <script>
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'f') {
-                event.preventDefault();
-                document.getElementById('search-bar').focus();
-            }
-        });
-    </script>    
+<script>
+    document.getElementById('navbar-toggle').addEventListener('click', function () {
+        const dropdown = document.getElementById('mobile-dropdown');
+        dropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.ctrlKey && event.key === 'f') {
+            event.preventDefault();
+            document.getElementById('search-bar').focus();
+        }
+    });
+</script>

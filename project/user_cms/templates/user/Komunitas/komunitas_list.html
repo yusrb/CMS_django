@@ -3,11 +3,11 @@
 {% include 'snippets/nav.html' %}
 
 {% block content %}
-<div class="container-fluid mt-5 pt-3">
+<div class="container-fluid lg:mt-5 pt-3">
     <div class="container">
         <div class="row">
             <!-- Komunitas List Start -->
-            <div class="w-[66.6%]">
+            <div class="w-[100%] lg:w-[66.6%]">
                 <div class="section-title mb-3 text-center">
                     <h4 class="m-0 text-uppercase font-weight-bold ">Komunitas Musik</h4>
                 </div>
@@ -23,7 +23,7 @@
                             {% endif %}
                             <div class="card-body">
                                 <h5 class="card-title font-weight-bold">{{ komunitas.nama }}</h5>
-                                <p class="card-text text-muted">{{ komunitas.deskripsi|truncatewords:30 }}</p>
+                                <p class="card-text text-muted">{{ komunitas.deskripsi|truncatewords:21 }}</p>
                                 <div class="d-flex justify-content-between align-items-center mt-3">
                                     <a href="{% url 'user:komunitas_detail' komunitas.pk %}" class="btn btn-outline-primary btn-sm">Detail Komunitas</a>
                                 </div>

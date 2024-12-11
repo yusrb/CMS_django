@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex items-center justify-center min-h-screen bg-gradient-to-r  from-yellow-400 to-yellow-200">
-    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-lg">
-        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Login to Your Account</h2>
+<div class="flex items-start justify-center min-h-screen bg-gradient-to-r from-yellow-400 to-yellow-200 py-24 px-2">
+    <div class="bg-white shadow-lg rounded-lg p-6 sm:p-8 w-full max-w-md">
+        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Login to Your Account</h2>
 
         {% if messages %}
             <div class="mb-4">
@@ -62,14 +62,14 @@
             <button type="submit" class="w-full bg-yellow-400 text-white py-3 rounded-lg shadow-lg hover:bg-yellow-500 transition duration-200">Login</button>
         </form>
 
-        <div class="flex justify-between items-center mt-6">
-            <a href="{% url 'user_password_reset' %}" class="text-yellow-500 text-sm hover:underline relative bottom-2">
+        <div class="flex justify-between items-center mt-6 text-[13px] lg:text-sm text-gray-500">
+            <a href="{% url 'user_password_reset' %}" class="text-yellow-500 hover:underline">
                 Lupa Password?
             </a>
-            <p class="text-sm text-center text-gray-500">Belum punya akun? <a href="{% url 'user:user_register' %}" class="text-yellow-500 hover:underline">Daftar</a>.</p>
+            <p class="relative top-2">Belum punya akun? <a href="{% url 'user:user_register' %}" class="text-yellow-500 hover:underline">Daftar</a>.</p>
         </div>
 
-        <div class="text-center relative top-2 left-36">
+        <div class="text-center mt-4">
             <a href="{% url 'user:konten_list' %}" class="text-yellow-400 text-sm font-semibold hover:underline">
                 Lanjut sebagai Guest
             </a>
