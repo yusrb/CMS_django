@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+{% include 'snippets/nav.html' %}
+<div class="container-fluid mt-5 pt-3" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+    <div class="container">
+        <div class="row">
+            <!-- Profile Main Section Start -->
+            <div class="col-lg-8">
+                <div class="section-title mb-4">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Profil {{ user.username }}</h4>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-4">
+                        {% if user.foto %}
+                            <img class="img-fluid rounded-circle" src="{{ user.foto.url }}" style="object-fit: cover; height: 200px; width: 200px;" id="profileImage">
+                        {% else %}
+                            <img class="img-fluid rounded-circle" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" style="object-fit: cover; height: 200px; width: 200px;" id="profileImage">
+                        {% endif %}
+                    </div>
+                    <div class="col-8">
+                        <h5 class="font-weight-bold"><span class="text-md">@</span>{{ user.username }}</h5>
+                        <p><strong>Nama:</strong> {{ user.nama }}</p>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Telepon:</strong> {{ user.telepon }}</p>
+                        <p><strong>Tentang:</strong> {{ user.about }}</p>
+                    </div>
+                </div>
+
+                <!-- User Articles Start -->
+                <div class="section-title mb-4">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Artikel oleh {{ user.username }}</h4>
+                </div>
+                
+                <div class="row">
+                    {% for konten in kontens %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="position-relative">
+                            <img class="img-fluid w-100" src="{{ konten.foto.url }}" style="object-fit: cover; height: 280px;">
+                            <div class="bg-white border border-top-0 p-4">
+                                <div class="mb-2">
+                                    <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2" href="{% url 'user:kategori_detail' konten.kategori.pk %}">{{ konten.kategori }}</a>
+                                    <a class="text-body" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ konten.tanggal|date:'Y-m-d' }}">
+                                        <small>{{ konten.tanggal|date:"M d, Y" }}</small>
+                                    </a>
+                                </div>
+                                <a class="mb-0 text-[20px] hover:text-black hover:underline w-[60%] text-black font-extrabold" href="{% url 'user:konten_detail' konten.slug %}">{{ konten.judul }}</a>
+                            </div>
+                            <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
+                                <div class="d-flex align-items-center">
+                                    {% if konten.user.foto %}
+                                        <img class="rounded-circle mr-2" src="{{ konten.user.foto.url }}" width="25" height="25" alt="">
+                                    {% else %}
+                                        <img class="rounded-circle mr-2" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" width="25" height="25" alt="">
+                                    {% endif %}
+                                    <small>{{ konten.user }}</small>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <small class="ml-3"><i class="far fa-eye mr-2"></i>{{ konten.dilihat }}</small>
+                                    <small class="ml-3"><i class="far fa-comment mr-2"></i>{{ konten.total_komentar }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p class="text-center relative bottom-1">{{ user.username }} belum memiliki artikel.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- User Articles End -->
+
+                <!-- User Comments Activity Start -->
+                <div class="section-title mb-2">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Aktivitas Komentar oleh {{ user.username }}</h4>
+                </div>
+                
+                <div class="bg-light p-4 rounded shadow shadow-1xl">
+                    {% for komentar in user.komen_set.all|slice:":3" %}
+                    <div class="mb-3 border-bottom pb-2">
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'user:konten_detail' komentar.konten.slug %}">
+                                <h6 class="font-weight-bold">{{ komentar.konten.judul }}</h6>
+                            </a>
+                            <small class="text-muted">{{ komentar.created_at|date:"d M, Y" }}</small>
+                        </div>
+                        <p>{{ komentar.pesan }}</p>
+                    </div>
+                    {% empty %}
+                    <p class="text-center relative top-1">Belum ada komentar yang dibuat.</p>
+                    {% endfor %}
+                </div>
+                <!-- User Comments Activity End -->
+            </div>
+            <!-- Profile Main Section End -->
+
+            <!-- Sidebar Start -->
+            <div class="col-lg-4">
+                <!-- Popular News Start -->
+                <div class="mb-3">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Top News</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-3">
+                        {% for post in top_posts_user %}
+                        <div class="d-flex align-items-center bg-white mb-3" style="height: 110px;">
+                            <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
+                                <div class="mb-2">
+                                    <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2" href="{{ post.kategori.url }}">{{ post.kategori }}</a>
+                                    <a class="text-body" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ post.tanggal|date:'Y-m-d' }}">
+                                        <small>{{ post.tanggal|date:"M d, Y" }}</small>
+                                    </a>
+                                </div>
+                                <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="{% url 'user:konten_detail' post.slug %}">{{ post.judul|truncatechars:18 }}</a>
+                                <div class="flex relative left-[13rem]">
+                                    <small class="ml-3"><i class="far fa-eye mr-[6px]"></i>{{ post.dilihat }}</small>
+                                    <small class="ml-[11px]"><i class="far fa-comment mr-[6px]"></i>{{ post.total_komentar }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-center relative top-2"> {{user.username}} belum memiliki artikel.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Popular News End -->
+
+                <!-- Social Links Start -->
+                <div class="mb-3">
+                    <div class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">Social Media</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-3">
+                        {% if user.konfigurasi.x or user.konfigurasi.facebook or user.konfigurasi.linkedin or user.konfigurasi.instagram or user.konfigurasi.tiktok %}
+                            {% if user.konfigurasi.x %}
+                            <a href="{{ user.konfigurasi.x }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #1DA1F2;">
+                                <i class="fab fa-twitter text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">Twitter</span>
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.konfigurasi.facebook %}
+                            <a href="{{ user.konfigurasi.facebook }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #39569E;">
+                                <i class="fab fa-facebook-f text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">Facebook</span>
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.konfigurasi.linkedin %}
+                            <a href="{{ user.konfigurasi.linkedin }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #0077B5;">
+                                <i class="fab fa-linkedin-in text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">LinkedIn</span>
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.konfigurasi.instagram %}
+                            <a href="{{ user.konfigurasi.instagram }}" class="d-block w-100 text-white text-decoration-none mb-3" style="background: #52AAF4;">
+                                <i class="fab fa-instagram text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">Instagram</span>
+                            </a>
+                            {% endif %}
+                            
+                            {% if user.konfigurasi.tiktok %}
+                            <a href="{{ user.konfigurasi.tiktok }}" class="d-block w-100 text-white text-decoration-none" style="background: #69C9D0;">
+                                <i class="fab fa-tiktok text-center py-4 mr-3" style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                                <span class="font-weight-medium">TikTok</span>
+                            </a>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-center text-muted mb-0">Belum memiliki sosial media</p>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+                <!-- Social Links End -->
+            </div>
+            <!-- Sidebar End -->
+        </div>
+    </div>
+</div>
+
+{% include 'snippets/footer.html' %}
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary btn-square back-to-top"><i class="fa fa-arrow-up"></i></a>
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'lib/easing/easing.min.js' %}"></script>
+<script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+<!-- Template Javascript -->
+<script src="{% static 'js/main.js' %}"></script>
+
+{% endblock content %}

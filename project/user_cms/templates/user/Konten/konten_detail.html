@@ -1,0 +1,743 @@
+{% include 'base.html' %}
+{% load static %}
+
+{% include 'snippets/nav.html' %}
+
+{% block content %}
+<style>
+    .owl-carousel .owl-nav {
+        display: none;
+    }
+
+    .owl-carousel.owl-loaded .owl-nav {
+        display: hidden;
+    }
+
+    .owl-carousel .owl-item:not(:first-child) {
+        display: hidden;
+    }
+</style>
+<!-- Breaking News Start -->
+<div class="container-fluid mt-5 mb-3 pt-3">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-start">
+                    <!-- Judul Konten Lain-->
+                    <div class="section-title border-right-0 mb-0" style="flex: 0 0 158px;">
+                        <h4 class="ml-1 m-0 text-uppercase font-weight-bold border-r-2" style="font-size: 18px;">Another Contents
+                        </h4>
+                    </div>
+                    <!-- Carousel Konten Lainnya -->
+                    <div class="owl-carousel tranding-carousel position-relative d-flex h-[75px] space-x-32 align-items-center bg-white border border-left-0"
+                        style="flex: 1; padding-right: 0;">
+                        {% for konten in konten_lain|slice:":3" %}
+                        <div class="item">
+                            <a class="text-secondary text-lg ml-4 text-uppercase font-weight-semi-bold"
+                                href="{% url 'user:konten_detail' konten.slug %}">
+                                {{ konten.judul }}
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breaking News End -->
+
+<!-- News With Sidebar Start -->
+<div class="container-fluid relative">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- News Detail Start -->
+                <div class="position-relative mb-3">
+                    <img class="img-fluid w-100" src="{{konten.foto.url}}" style="object-fit: cover;">
+                    <div class="bg-white border border-top-0 p-4">
+                        <div class="mb-3">
+                            <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+                                href="{% url 'user:kategori_detail' konten.kategori.pk %}">{{konten.kategori}}</a>
+                            <a class="text-body" href="{% url 'user:konten_tanggal_list' %}">{{konten.tanggal}}</a>
+                        </div>
+                        <h1 class="mb-3 text-3xl text-uppercase font-weight-bold">{{konten.judul}}</h1>
+                        <p>{{konten.isi_konten|safe}}</p>
+                    </div>
+                    <div class="d-flex justify-content-between bg-white border border-top-0 p-4">
+                        {% if konten.user.pk is request.user.pk %}
+                        <a href="{% url 'user:user_profil' konten.user.pk %}">
+                            <div class="d-flex align-items-center">
+                                {% if konten.user.foto %}
+                                <img class="rounded-circle mr-2" src="{{ konten.user.foto.url }}" width="25" height="25"
+                                    alt="{{ konten.user.username }}">
+                                {% else %}
+                                <img class="rounded-circle mr-2"
+                                    src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                                    width="25" height="25" alt="Default Profile Picture">
+                                {% endif %}
+                                <span class="font-semibold">{{konten.user.username}}</span>
+                                {% comment %} <span class="text-[10px]">{{konten.user.about}}</span> {% endcomment %}
+                            </div>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'user:user_detail' konten.user.pk %}">
+                            <div class="d-flex align-items-center">
+                                {% if konten.user.foto.url and konten.user.foto %}
+                                <img class="rounded-circle mr-2" src="{{ konten.user.foto.url }}" width="25" height="25"
+                                    alt="{{ konten.user.username }}">
+                                {% else %}
+                                <img class="rounded-circle mr-2"
+                                    src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
+                                    width="25" height="25" alt="Default Profile Picture">
+                                {% endif %}
+                                <span class="font-semibold">{{konten.user.username}}</span>
+                            </div>
+                        </a>
+                        {% endif %}
+                        <div class="d-flex align-items-center">
+                            <span class="ml-3">
+                                <i class="far fa-eye mr-2"></i>{{konten.dilihat}}</span>
+                            <span class="ml-3">
+                                <i class="far fa-comment mr-2"></i>{{komentars}}</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- News Detail End -->
+
+                <!-- Comment List Start -->
+                <div class="mb-3">
+                    <div id="comments-section" class="section-title mb-0">
+                        <h4 class="m-0 text-uppercase font-weight-bold">{{ komentars }} Comments</h4>
+                    </div>
+                    <div class="bg-white border border-top-0 p-4 rounded-lg shadow">
+                        {% for komen in konten.komentar.all %}
+                        <div id="komen-{{ komen.id }}" class="media mb-4 position-relative">
+                            <a class="text-secondary font-weight-bold" href="{% url 'user:user_profil' komen.user.pk %}">
+                                <img src="{{ komen.user.foto.url }}" alt="User Image" class="img-fluid rounded-full mr-3" style="width: 34px;">
+                            </a>
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <h6 class="font-bold">{{ komen.user.username }}</h6>
+                                    <small class="text-gray-500 text-[12px] absolute left-[107px]" style="top: 0; right: 10px;">
+                                        <i>{{ komen.created_at|timesince }} ago</i>
+                                    </small>
+                                </div>
+                                <p>{{ komen.pesan }}</p>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="toggleReplyForm({{ komen.id }})">
+                                    Reply
+                                </button>
+
+                                {% if komen.user.pk == request.user.pk %}
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm btn-outline-secondary items-center" type="button"
+                                        id="dropdownMenuButton-{{ komen.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class='bx bx-chevron-down font-bolder relative top-[1px]' ></i>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ komen.id }}">
+                                        <li><a class="dropdown-item" href="#" onclick="showUpdateKomenForm({{ komen.id }})">Update</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="confirmDelete({{ komen.id }})">Delete</a></li>
+
+                                        <!-- Form Delete -->
+                                        <form id="delete-form-{{ komen.id }}" method="post" action="{% url 'user:komentar_delete' komen.id %}" style="display:none;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </ul>
+                                </div>
+
+                                <!-- Form Update -->
+                                <div id="update-form-{{ komen.id }}" class="update-form" style="display:none;">
+                                    <form action="{% url 'user:komentar_update' komen.id %}" method="post">
+                                        {% csrf_token %}
+                                        <div class="form-group mt-1">
+                                            <textarea name="pesan" class="form-control" rows="3">{{ komen.pesan }}</textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                        <button type="button" class="btn btn-danger" onclick="hideUpdateKomenForm({{ komen.id }})">X</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+
+
+                                <!-- Reply Form -->
+                                <div id="reply-form-{{ komen.id }}" class="mt-2" style="display:none;">
+                                    <form method="post" action="{% url 'user:reply_komen' komen.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="nama" value="{{ konten.user.nama }}">
+                                        <input type="hidden" name="email" value="{{ konten.user.email }}">
+                                        <div class="form-group">
+                                            <textarea name="pesan" id="message" cols="30" rows="3" class="form-control"
+                                                placeholder="Your reply..." required="required"></textarea>
+                                        </div>
+                                        <div class="form-group mb-0">
+                                            <input type="submit" value="Send Reply"
+                                                class="btn btn-primary font-weight-semi-bold py-2 px-3">
+                                            <button type="button" class="btn btn-danger py-2" onclick="hideReplyForm({{ komen.id }})">X</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Balasan -->
+                                {% for reply in komen.replies.all %}
+                                <div class="media mt-3 ml-5">
+                                    <a class="text-secondary font-weight-bold"
+                                        href="{% url 'user:user_detail' user.pk %}">
+                                        {% if reply.user.foto.url %}
+                                        <img src="{{reply.user.foto.url}}" alt="Image"
+                                            class="img-fluid mr-3 relative bottom-2 left-[8px] mt-1 rounded-full"
+                                            style="width: 34px;">
+                                        {% else %}
+                                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKsAAACUCAMAAADbGilTAAAAMFBMVEXk5ueutLenrrHg4+Tn6eqqsLTN0NLT1tjY29zGysy4vcC/xMbJzc/b3t/q7O2xt7pnBWjmAAAD/klEQVR4nO2cW7LbIAxADQiDIcD+d1ucx62TJr6AbIlMOR+dfp4qAiSQO02DwWAwGAwGg8FgMBicAQC3QQkxRmWNMTaoGHs2VmH2Qkqptc5/yuRNyDHmtvoXAHtxQost2dnPtreEgGhdehZ9+CYfIrfeE8G9Fb1H16luQgtqkZ9Vr7pLJ7ZgdoL6kHW2B1lYfhO9MfPLKv9rUH/ygFvVlZmusp45suWqqyynaUVUb7KMaeCrVNec5UqDuBQuqw2GRxasrFYVwrK4qtSgKhxLyhaeAS/oC0MW2PpkvSLpAwvvS8ACyI8EMK2qIpGXMXWnwHNgaU3BtKsKEWhla0+sLcRbQcCEVWjKBgzm5pW1IilPWkCsrBVPGFhoqQQ2JDrVqalq2UK3xUJpj/URukYxItNVCLqau60a3ELXzAS0K1kVCxarKhLVMYsrBm5QtTIwo1U1mesF7Sq/yFWb4XqGK10OfNPa+qY9C+9KdhZ80xmLr100nSug47pQqeZaG+tKV2sjLojuEF4TfVNviE1Y0p4bd5ehSV8NkHdEtJeaqLs32pcjXPlC/RaDWF3UT52YLZb8Pa5926J/7gbTeB4wvBm1bgV64Zgqsl/0xtmWBVQN7Aux4RqWb0Kn9h6Wc+SlsvHSjs00o6pcWVUnqGgT+ccK96Yen1U9t2qmTFbTta47wFyQB8n0MQQLwe+fClr7wP/7PzBiJxFk4hl0+gCAeZ8I+Z/gmObHPgOTWZLWr8PlbjG9zZavwBTWUfjryP51al/7i1U9zuzfyUG0Zs6YoHoM6AZYiSvXv/Upmw1zDoQ1psuNHNr1SxOIXSlff/fFpbc7QUo5a3v4mAdABTv7JPe+L1iXmcj7QWBcZxCVufi0dwpshXX2nQNLgPPu7+ubw+TmibgwAGX97u++E2Dp5kCWDNevnzTiAlYLb0hsP3/9VGWbc+Fs23zqo0UfXE691cimDjtF9hed5vOq2mjR71ovuMs5exioo01XzijDYcIPDbxFHt7e5pbqqCX1ij64b4gnBfXOgbdcOVOPW/3v0IeN8UPx1Uq77EF3nQdMD5bYHvE+d8DQUJks/tXrgFmsUlmHrBBO3gCeZXGRRb6918pi7pKpcvVHtj2yNDvAs2xjygJuoKGNxs961OlHwDvaioMzSsDfSQ3dAn4GqxFX35MrJlWh60sDngxYqZ03pd+uNtS+LqG/zkGgqwLLtrBuVC2viB5wRSEr2kVo/Vb7KCqOWuynj2gqtgL87DiWuTisxKXgG4qLw1Mug+oo3rbqBkPOcS09aNFfvx5A4Rbb8l+hHI4sdGXfBUTxhGTsIAWKx897cC1svLgP2BtFxyzMsgdcUVxVUD1Qojr43/gDTjs3mRf1UggAAAAASUVORK5CYII="
+                                            alt="Image"
+                                            class="img-fluid mr-3 relative bottom-2 left-[8px] mt-1 rounded-full"
+                                            style="width: 34px;">
+                                        {% endif %}
+                                        <div class="media-body">
+                                            <h6>
+                                                {{ reply.user.username }}
+                                    </a>
+                                    <small>
+                                        <i>{{ reply.created_at|timesince}}</i>
+                                    </small>
+                                    </h6>
+                                    <p>{{ reply.pesan }}</p>
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                        onclick="toggleReplyForm({{ komen.id }}, {{ reply.id }})">Reply</button>
+
+                                    <!-- Reply form bercabang -->
+                                    {% if reply.user.pk == request.user.pk %}
+                                    <div class="dropdown d-inline-block">
+                                        <button class="btn btn-sm btn-outline-secondary items-center" type="button"
+                                                id="dropdownMenuButton-{{ reply.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class='bx bx-chevron-down font-bolder relative top-[1px]'></i>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ reply.id }}">
+                                            <li><a class="dropdown-item" href="#" onclick="showUpdateReplyForm({{ reply.id }})">Update</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="confirmDeleteReply({{ reply.id }})">Delete</a></li>
+                                        </ul>
+                                    </div>
+
+                                    <div id="update-form-{{ reply.id }}" class="update-form" style="display:none;">
+                                        <form action="{% url 'user:reply_update' reply.id %}" method="post">
+                                            {% csrf_token %}
+                                            <div class="form-group mt-1">
+                                                <textarea name="pesan" class="form-control" rows="3">{{ reply.pesan }}</textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Update</button>
+                                            <button type="button" class="btn btn-danger" onclick="hideUpdateReplyForm({{ reply.id }})">X</button>
+                                        </form>
+                                    </div>
+
+                                    <!-- Form Delete Reply -->
+                                    <form id="delete-form-{{ reply.id }}" method="post" action="{% url 'user:reply_delete' reply.id %}" style="display:none;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Delete Reply</button>
+                                    </form>
+                                    {% endif %}
+
+                                    <div id="reply-form-{{ reply.id }}" class="mt-2" style="display:none;">
+                                        <form method="post" action="{% url 'user:reply_komen' komen.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="nama" value="{{ konten.user.nama }}">
+                                            <input type="hidden" name="email" value="{{ konten.user.email }}">
+                                            <div class="form-group">
+                                                <textarea name="pesan" id="message" cols="30" rows="3" class="form-control" placeholder="Your reply..." required="required"></textarea>
+                                            </div>
+                                            <div class="form-group mb-0">
+                                                <input type="submit" value="Send Reply" class="btn btn-primary font-weight-semi-bold py-2 px-3">
+                                                <button type="button" class="btn btn-danger py-2" onclick="hideReplyForm({{ reply.id }})">X</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p>Belum ada komentar.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Comment List End -->
+
+            <!-- Comment Form Start -->
+            <div class="mb-3">
+                <div class="section-title mb-0">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Leave a comment</h4>
+                </div>
+                <div class="bg-white border border-top-0 p-4">
+                    <form method="post" action="{% url 'user:konten_detail' konten.slug %}?hash=#comments-section">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    {% if user.is_authenticated %}
+                                    <label for="name">Name *</label>
+                                    <input type="text" name="nama" class="form-control" id="name"
+                                        value="{{request.user.username}}" required="required">
+                                    {% else %}
+                                    <label for="name">Name *</label>
+                                    <input type="text" name="nama" class="form-control" id="name" required="required">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    {% if user.is_authenticated %}
+                                    <label for="email">Email *</label>
+                                    <input type="email" name="email" class="form-control" value="{{request.user.email}}"
+                                        id="email" required="required">
+                                    {% else %}
+                                    <label for="email">Email *</label>
+                                    <input type="email" name="email" class="form-control" id="email"
+                                        required="required">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea name="pesan" id="message" cols="30" rows="5" class="form-control"
+                                required="required"></textarea>
+                        </div>
+                        <div class="form-group mb-0">
+                            <input type="submit" value="Leave a comment"
+                                class="btn btn-primary font-weight-semi-bold py-2 px-3">
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Comment Form End -->
+        </div>
+
+        <div class="col-lg-4 sticky-top">
+            {% for konfigurasi in konfigurasis %}
+            {% if konten.user.konfigurasi.x or konten.user.konfigurasi.facebook or konten.user.konfigurasi.linkedin or konten.user.konfigurasi.instagram or konten.user.konfigurasi.tiktok %}
+            <!-- Social Follow Start -->
+            <div class="mb-3">
+                <div class="section-title mb-0">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Follow Me</h4>
+                </div>
+                <div class="bg-white border border-top-0 p-3">
+                    {% if konten.user.konfigurasi.x %}
+                    <a href="{{ konfigurasi.x }}" class="d-block w-100 text-white text-decoration-none mb-3"
+                        style="background: #1DA1F2;">
+                        <i class="fab fa-twitter text-center py-4 mr-3"
+                            style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                        <span class="font-weight-medium">X</span>
+                    </a>
+                    {% endif %}
+                    {% if konten.user.konfigurasi.facebook %}
+                    <a href="{{ konfigurasi.facebook }}" class="d-block w-100 text-white text-decoration-none mb-3"
+                        style="background: #39569E;">
+                        <i class="fab fa-facebook-f text-center py-4 mr-3"
+                            style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                        <span class="font-weight-medium">Facebook</span>
+                    </a>
+                    {% endif %}
+                    {% if konten.user.konfigurasi.linkedin %}
+                    <a href="{{ konfigurasi.linkedin }}" class="d-block w-100 text-white text-decoration-none mb-3"
+                        style="background: #0077B5;">
+                        <i class="fab fa-linkedin-in text-center py-4 mr-3"
+                            style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                        <span class="font-weight-medium">Linkedin</span>
+                    </a>
+                    {% endif %}
+                    {% if konten.user.konfigurasi.instagram %}
+                    <a href="{{ konfigurasi.instagram }}" class="d-block w-100 text-white text-decoration-none mb-3"
+                        style="background: #52AAF4;">
+                        <i class="fab fa-instagram text-center py-4 mr-3"
+                            style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                        <span class="font-weight-medium">Instagram</span>
+                    </a>
+                    {% endif %}
+                    {% if konten.user.konfigurasi.tiktok %}
+                    <a href="{{ konfigurasi.tiktok }}" class="d-block w-100 text-white text-decoration-none mb-3"
+                        style="background: black;">
+                        <i class="fab fa-tiktok text-center py-4 mr-3"
+                            style="width: 65px; background: rgba(0, 0, 0, .2);"></i>
+                        <span class="font-weight-medium">Tik Tok</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Social Follow End -->
+            {% else %}
+            <div class="mb-3">
+                <div class="section-title mb-0">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Follow Me</h4>
+                </div>
+                <div class="bg-white border border-top-0 p-3 text-center">
+                    <p class="text-md">Belum ada Social Media.</p>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Popular News Start -->
+            <div class="mb-3">
+                <div class="section-title mb-0">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Trending News</h4>
+                </div>
+                <div class="bg-white border border-top-0 p-3">
+                    {% for post in top_posts %}
+                    <div class="d-flex align-items-center bg-white mb-3" style="height: 110px;">
+                        <div class="w-100 h-100 px-3 d-flex flex-column justify-content-center border border-left-0">
+                            <div class="mb-2">
+                                <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2"
+                                    href="{% url 'user:kategori_detail' post.kategori.pk %}">{{ post.kategori }}</a>
+                                <a class="text-body" href="{% url 'user:konten_tanggal_list' %}">
+                                    <small>{{ post.tanggal|date:"d M, Y" }}</small>
+                                </a>
+                            </div>
+                            <a class="h6 m-0 text-secondary text-uppercase font-weight-bold"
+                                href="{% url 'user:konten_detail' post.slug %}">{{ post.judul|truncatechars:18 }}</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- Popular News End -->
+
+            <!-- Tags Start -->
+            <div class="mb-3">
+                <div class="section-title mb-0">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Tags</h4>
+                </div>
+                <div class="bg-white border border-top-0 p-3">
+                    <div class="d-flex flex-wrap m-n1">
+                        {% for kategori in kategoris %}
+                        <a href="{% url 'user:kategori_detail' kategori.pk %}"
+                            class="btn btn-sm btn-outline-secondary m-1">{{ kategori.kategori }}</a>
+                        {% if forloop.counter|divisibleby:3 %}
+                        <div class="w-100"></div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <!-- Tags End -->
+
+            <!-- Saran Form Start -->z
+            <div class="mb-3" id="saran_form">
+                <div class="section-title mb-0">
+                    <h4 class="m-0 text-uppercase font-weight-bold">Kirim Saran</h4>
+                </div>
+                <div class="bg-white text-center border border-top-0 p-3">
+                    <p class="text-[14px]">Silakan masukkan saran Anda di bawah ini:</p>
+                    <form action="{% url 'user:saran_create' %}?asal=konten_detail&slug={{ konten.slug }}"
+                        method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea class="form-control form-control-lg" name="isi_saran" placeholder="Isi Saran"
+                                rows="4" required="required"></textarea>
+                        </div>
+                        <div class="input-group mb-2" style="width: 100%;">
+                            <input type="text" class="form-control form-control-lg mb-3" name="nama" placeholder="Nama"
+                                value="{{request.user.nama}}" required="required">
+                            <div class="input-group-append">
+                                <input type="email" class="form-control form-control-lg" name="email"
+                                    placeholder="Email" value="{{request.user.email}}" required="required">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary font-weight-bold px-3" type="submit">Kirim
+                                        Saran</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    {% if messages %}
+                    {% for message in messages %}
+                    <small class="text-success">{{ message }}</small>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Saran Form End -->
+        </div>
+    </div>
+</div>
+</div>
+<!-- News With Sidebar End -->
+
+{% include 'snippets/footer.html' %}
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary btn-square back-to-top">
+    <i class="fa fa-arrow-up"></i>
+</a>
+
+<script>
+    function toggleReplyForm(komenId, replyId = null) {
+        const allReplyForms = document.querySelectorAll('[id^="reply-form-"]');
+        const allUpdateForms = document.querySelectorAll('[id^="update-form-"]');
+
+        allReplyForms.forEach(function (form) {
+            form.style.display = "none";
+        });
+        allUpdateForms.forEach(function (form) {
+            form.style.display = "none";
+        });
+
+        const replyFormId = replyId ? `reply-form-${replyId}` : `reply-form-${komenId}`;
+        const replyForm = document.getElementById(replyFormId);
+
+        if (replyForm) {
+            replyForm.style.display = "block";
+            smoothScroll(replyForm, 300);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const hash = window.location.hash;
+
+        if (hash) {
+            const target = document.querySelector(hash);
+            if (target) {
+                function smoothScroll(target, duration) {
+                    const start = window.scrollY;
+                    const end = target
+                        .getBoundingClientRect()
+                        .top + start;
+                    const distance = end - start;
+                    let startTime = null;
+
+                    function animation(currentTime) {
+                        if (startTime === null)
+                            startTime = currentTime;
+                        const timeElapsed = currentTime - startTime;
+                        const run = easeInOutQuad(timeElapsed, start, distance, duration);
+                        window.scrollTo(0, run);
+
+                        if (timeElapsed < duration)
+                            requestAnimationFrame(animation);
+                    }
+
+                    function easeInOutQuad(t, b, c, d) {
+                        t /= d / 2;
+                        if (t < 1)
+                            return c / 2 * t * t + b;
+                        t--;
+                        return -c / 2 * (t * (t - 2) - 1) + b;
+                    }
+
+                    requestAnimationFrame(animation);
+                }
+
+                smoothScroll(target, 2000);
+            }
+        }
+    });
+
+    function smoothScroll(target, duration) {
+        const start = window.scrollY;
+        const end = target.getBoundingClientRect().top + start;
+        const distance = end - start;
+        let startTime = null;
+
+        function animation(currentTime) {
+            if (startTime === null) startTime = currentTime;
+            const timeElapsed = currentTime - startTime;
+            const run = easeInOutQuad(timeElapsed, start, distance, duration);
+            window.scrollTo(0, run);
+
+            if (timeElapsed < duration) requestAnimationFrame(animation);
+        }
+
+        function easeInOutQuad(t, b, c, d) {
+            t /= d / 2;
+            if (t < 1) return c / 2 * t * t + b;
+            t--;
+            return -c / 2 * (t * (t - 2) - 1) + b;
+        }
+
+        requestAnimationFrame(animation);
+    }
+
+    function scrollToElementById(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    }
+
+    function showUpdateKomenForm(komenId) {
+        const allReplyForms = document.querySelectorAll('[id^="reply-form-"]');
+        const allUpdateForms = document.querySelectorAll('[id^="update-form-"]');
+
+        allReplyForms.forEach(function (form) {
+            form.style.display = "none";
+        });
+        allUpdateForms.forEach(function (form) {
+            form.style.display = "none";
+        });
+
+        var form = document.getElementById('update-form-' + komenId);
+        form.style.display = 'block';
+
+        setTimeout(function () {
+            form.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }, 500);
+    }
+
+    function hideUpdateKomenForm(KomenId) {
+        var form = document.getElementById('update-form-' + KomenId);
+        form.style.display = 'none';
+
+        setTimeout(function () {
+            var commentSection = document.getElementById('comments-section');
+            commentSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 500);
+    }
+
+    function confirmDelete(komenId) {
+        if (confirm('Yakin ingin menghapus komentar ini?')) {
+            document.getElementById('delete-form-' + komenId).submit();
+        } else {
+            setTimeout(function () {
+                var commentSection = document.getElementById('comments-section');
+                commentSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 500);
+        }
+    }
+
+    function hideUpdateReplyForm(replyId) {
+        var form = document.getElementById('update-form-' + replyId);
+        form.style.display = 'none';
+
+        setTimeout(function () {
+            var commentSection = document.getElementById('comments-section');
+            commentSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 500);
+    }
+
+    function confirmDeleteReply(replyId) {
+        if (confirm('Yakin ingin menghapus balasan?')) {
+            document.getElementById('delete-form-' + replyId).submit();
+        } else {
+            setTimeout(function () {
+                var commentSection = document.getElementById('comments-section');
+                commentSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 500);
+        }
+    }
+
+    window.addEventListener('load', function () {
+        const hash = window.location.hash;
+        if (hash) {
+            const targetElement = document.querySelector(hash);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+    });
+
+    function showUpdateReplyForm(replyId) {
+        var form = document.getElementById('update-form-' + replyId);
+        form.style.display = 'block';
+        setTimeout(function () {
+            form.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }, 500);
+    }
+
+    function hideReplyForm(komenId) {
+        var form = document.getElementById('reply-form-' + komenId);
+        form.style.display = 'none';
+
+        setTimeout(function () {
+            var commentSection = document.getElementById('comments-section');
+            commentSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 100);
+    }
+
+    function cancelUpdateForm(komenId) {
+        document.getElementById('update-form-' + komenId).style.display = 'none';
+    }
+
+    window.addEventListener('load', function () {
+        const hash = window.location.hash;
+        if (hash) {
+            const targetElement = document.querySelector(hash);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const scrollTo = urlParams.get('scroll_to');
+    if (scrollTo) {
+        scrollToElementById(scrollTo);
+    }
+
+    window.onload = function () {
+        if (window.location.hash) {
+            var targetElement = document.querySelector(window.location.hash);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+    };
+
+    $(document).ready(function () {
+        var itemsCount = $('.owl-carousel .item').length;
+        $('.owl-carousel').owlCarousel({
+            loop: itemsCount > 1,
+            nav: itemsCount > 1,
+            dots: false,
+            margin: 10,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                768: {
+                    items: 2
+                },
+                1024: {
+                    items: 3
+                }
+            }
+        });
+    });
+</script>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'lib/easing/easing.min.js' %}"></script>
+<script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+<!-- Template Javascript -->
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock content %}
