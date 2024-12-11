@@ -111,7 +111,7 @@
                                                 src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
                                                 width="25" height="25" alt="Default Profile Picture">
                                             {% endif %}
-                                            <span class="font-semibold">{{ pertanyaan.penulis.username }}</span>
+                                            <span class="font-semibold relative">{{ pertanyaan.penulis.username }}</span>
                                         </a>
                                         {% else %}
                                         <a href="{% url 'user:user_detail' pertanyaan.penulis.pk %}"
@@ -124,7 +124,7 @@
                                                 src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7"
                                                 width="25" height="25" alt="Default Profile Picture">
                                             {% endif %}
-                                            <span class="font-semibold">{{ pertanyaan.penulis.username }}</span>
+                                            <span class="font-semibold relative right-[3px]">{{ pertanyaan.penulis.username }}</span>
                                         </a>
                                         {% endif %}
 
@@ -181,14 +181,13 @@
                                                             class="font-semibold">
                                                             {{ pertanyaan.penulis.username }}
                                                         </a>
-                                                        <span class="d-flex align-items-center ms-3">
+                                                        <span class="d-flex align-items-center">
                                                             <i class="fas fa-clock ms-3"></i>
                                                             <span class="ml-1">{{ pertanyaan.created_at|timesince }}
                                                                 ago</span>
                                                         </span>
                                                     </p>
                                                 </div>
-
 
                                                 <hr class="my-3">
 
@@ -205,8 +204,21 @@
                                                                     <i class="fas fa-ellipsis-v"></i>
                                                                 </button>
                                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonJawaban-{{ jawaban.id }}">
-                                                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#updateJawabanModal-{{ jawaban.id }}">Edit</a></li>
-                                                                    <li><a class="dropdown-item text-danger" href="#" onclick="confirmDeleteJawaban({{ jawaban.id }})">Hapus</a></li>
+                                                                    <li>
+                                                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#updateJawabanModal-{{ jawaban.id }}">
+                                                                            <i class="bi bi-pencil-square"></i> Edit
+                                                                        </a>
+                                                                    </li>
+
+                                                                    <li>
+                                                                        <a class="dropdown-item text-danger" href="#" onclick="confirmDeleteJawaban({{ jawaban.id }})">
+                                                                            <i class="bi bi-trash"></i> Hapus
+                                                                        </a>
+                                                                    </li>
+
+                                                                    <form id="delete-form-jawaban-{{ jawaban.id }}" method="post" action="{% url 'user:jawab_pertanyaan_delete' pertanyaan.id jawaban.id %}" style="display: none;">
+                                                                        {% csrf_token %}
+                                                                    </form>
                                                                 </ul>
                                                             </div>
                                                         </div>
@@ -286,23 +298,18 @@
                                 <!-- form Update Pertanyaan -->
                                 <div id="update-form-{{ pertanyaan.id }}" class="update-form mt-3"
                                     style="display:none;">
-                                    <form
-                                        action="{% url 'user:pertanyaan_komunitas_update' pertanyaan_id=pertanyaan.id %}"
-                                        method="post">
+                                    <form action="{% url 'user:pertanyaan_komunitas_update' pertanyaan_id=pertanyaan.id %}" method="post">
                                         {% csrf_token %}
                                         <div class="form-group">
                                             <label for="judul">Judul Pertanyaan</label>
-                                            <input type="text" name="judul" class="form-control"
-                                                value="{{ pertanyaan.judul }}" required>
+                                            <input type="text" name="judul" class="form-control" value="{{ pertanyaan.judul }}" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="isi">Isi Pertanyaan</label>
-                                            <textarea name="isi" class="form-control" rows="3"
-                                                required>{{ pertanyaan.isi }}</textarea>
+                                            <textarea name="isi" class="form-control" rows="3" required>{{ pertanyaan.isi }}</textarea>
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
-                                        <button type="button" class="btn btn-danger btn-sm"
-                                            onclick="hideUpdatePertanyaanForm({{ pertanyaan.id }})">Batal</button>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="hideUpdatePertanyaanForm({{ pertanyaan.id }})">Batal</button>
                                     </form>
                                 </div>
                             </div>
@@ -365,7 +372,7 @@
 
                             <div class="flex-1 mt-4 lg:mt-0">
                                 {% if user in komunitas.members.all %}
-                                <button class="px-1 py-2 bg-red-white hover:bg-gray-500 relative top-40 left-5 rounded text-gray-400 hover:text-white text-[10px] font-semibold mt-1"
+                                <button class="px-2 py-2 hover:bg-red-500 relative top-40 left-4 rounded text-gray-400 hover:text-white text-[10px] font-semibold mt-1"
                                     data-bs-toggle="modal" data-bs-target="#confirmLeaveModal">
                                     Keluar dari Komunitas
                                 </button>
@@ -453,89 +460,25 @@
     </div>
 </div>
 
+{% include 'snippets/footer.html' %}
+
+<a href="#" class="btn btn-primary btn-square back-to-top">
+    <i class="fa fa-arrow-up"></i>
+</a>
+
 <script>
-    function showUpdatePertanyaanForm(pertanyaanId) {
-        var currentForm = document.querySelector('.update-form[style="display: block;"]');
-        if (currentForm) {
-            var currentPertanyaanId = currentForm.id.replace('update-form-', '');
-            var currentDropdownButton = document.getElementById('dropdownMenuButton-' + currentPertanyaanId);
-            if (currentDropdownButton) {
-                currentDropdownButton.style.display = 'block';
-            }
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+            const alertMessages = document.querySelectorAll(".messages li");
+            alertMessages.forEach(alert => alert.remove());
+        }, 5000);
 
-            setTimeout(function () {
-                currentForm.style.display = 'none';
-            }, 100);
+        const params = new URLSearchParams(window.location.search);
+        const scrollTo = params.get("scroll_to");
+        if (scrollTo) {
+            scrollToElementById(scrollTo);
         }
-
-        var dropdownButton = document.getElementById('dropdownMenuButton-' + pertanyaanId);
-        if (dropdownButton) {
-            dropdownButton.style.display = 'none';
-        }
-
-        var formElement = document.getElementById('update-form-' + pertanyaanId);
-        var pertanyaanElement = document.getElementById('pertanyaan-' + pertanyaanId);
-
-        formElement.style.display = 'block';
-
-        setTimeout(function () {
-            pertanyaanElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }, 150);
-    }
-
-    function hideUpdatePertanyaanForm(pertanyaanId) {
-        var dropdownButton = document.getElementById('dropdownMenuButton-' + pertanyaanId);
-        if (dropdownButton) {
-            dropdownButton.style.display = 'block';
-        }
-
-        var formElement = document.getElementById('update-form-' + pertanyaanId);
-        if (formElement) {
-            formElement.style.display = 'none';
-        }
-    }
-
-    function confirmDeletePertanyaan(pertanyaanId) {
-        if (confirm('Apakah Anda yakin ingin menghapus pertanyaan ini?')) {
-            document.getElementById('delete-form-' + pertanyaanId).submit();
-        }
-    }
-
-    function confirmDeleteJawaban(jawabanId) {
-        var form = document.getElementById('delete-form-jawaban-' + jawabanId);
-        if (confirm('Apakah Anda yakin ingin menghapus jawaban ini?')) {
-            form.submit();
-        }
-    }
-
-
-    function showDeleteJawabanConfirm(jawabanId) {
-        if (confirm('Apakah Anda yakin ingin menghapus jawaban ini?')) {
-            var form = document.getElementById('delete-form-jawaban-' + jawabanId);
-            form.submit();
-        }
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const scrollTo = urlParams.get('scroll_to');
-    if (scrollTo) {
-        scrollToElementById(scrollTo);
-    }
-
-    window.onload = function () {
-        if (window.location.hash) {
-            var targetElement = document.querySelector(window.location.hash);
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
-        }
-    };
+    });
 
     function scrollToElementById(elementId) {
         const element = document.getElementById(elementId);
@@ -547,10 +490,77 @@
         }
     }
 
-    function toggleDescription(id) {
-        var descElement = document.getElementById('desc-' + id);
-        var arrowElement = document.getElementById('arrow-' + id);
+    function showUpdatePertanyaanForm(pertanyaanId) {
+        const currentForm = document.querySelector('.update-form[style="display: block;"]');
+        if (currentForm) {
+            const currentPertanyaanId = currentForm.id.replace('update-form-', '');
+            const currentDropdownButton = document.getElementById('dropdownMenuButton-' + currentPertanyaanId);
+            if (currentDropdownButton) {
+                currentDropdownButton.style.display = 'block';
+            }
+            setTimeout(function () {
+                currentForm.style.display = 'none';
+            }, 100);
+        }
+        const dropdownButton = document.getElementById('dropdownMenuButton-' + pertanyaanId);
+        if (dropdownButton) {
+            dropdownButton.style.display = 'none';
+        }
+        const formElement = document.getElementById('update-form-' + pertanyaanId);
+        const pertanyaanElement = document.getElementById('pertanyaan-' + pertanyaanId);
+        formElement.style.display = 'block';
+        setTimeout(function () {
+            pertanyaanElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }, 150);
+    }
 
+    function hideUpdatePertanyaanForm(pertanyaanId) {
+        const dropdownButton = document.getElementById('dropdownMenuButton-' + pertanyaanId);
+        if (dropdownButton) {
+            dropdownButton.style.display = 'block';
+        }
+        const formElement = document.getElementById('update-form-' + pertanyaanId);
+        if (formElement) {
+            formElement.style.display = 'none';
+        }
+        const pertanyaanElement = document.getElementById('pertanyaan-' + pertanyaanId);
+        if (pertanyaanElement) {
+            pertanyaanElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    }
+
+    function confirmDeletePertanyaan(pertanyaanId) {
+        if (confirm('Apakah Anda yakin ingin menghapus pertanyaan ini?')) {
+            document.getElementById('delete-form-' + pertanyaanId).submit();
+        }
+    }
+
+    function confirmDeleteJawaban(jawabanId) {
+        const form = document.getElementById('delete-form-jawaban-' + jawabanId);
+        if (confirm('Apakah Anda yakin ingin menghapus jawaban ini?')) {
+            const jawabanElement = document.getElementById('jawaban-' + jawabanId);
+
+            if (jawabanElement) {
+                jawabanElement.style.transition = "opacity 1s ease";
+                jawabanElement.style.opacity = 0;
+                setTimeout(() => {
+                    form.submit();
+                }, 10000);
+            } else {
+                form.submit();
+            }
+        }
+    }
+
+    function toggleDescription(id) {
+        const descElement = document.getElementById('desc-' + id);
+        const arrowElement = document.getElementById('arrow-' + id);
         if (descElement.classList.contains('hidden')) {
             descElement.classList.remove('hidden');
             arrowElement.classList.remove('fa-chevron-down');
@@ -562,11 +572,31 @@
         }
     }
 
+    window.onload = function () {
+        if (window.location.hash) {
+            const targetElement = document.querySelector(window.location.hash);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+    };
+
     {%if messages %}
     var myModal = new bootstrap.Modal(document.getElementById('errorModal'), {});
     myModal.show();
     {% endif %}
 </script>
 
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'lib/easing/easing.min.js' %}"></script>
+<script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+<!-- Template Javascript -->
+<script src="{% static 'js/main.js' %}"></script>
 
 {% endblock content %}

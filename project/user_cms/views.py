@@ -282,16 +282,20 @@ class KomunitasDetailView(DetailView):
         context['peraturans'] = PeraturanKomunitas.objects.filter(komunitas = self.get_object().id)
         context['bookmarks'] = Bookmarks.objects.filter(komunitas = self.get_object().id)
 
-        if self.request.user.is_authenticated:
-            cache_key = f'komunitas_{komunitas.id}_users_online'
-            users_online = cache.get(cache_key, [])
-            if self.request.user.id not in users_online:
-                users_online.append(self.request.user.id)
-                cache.set(cache_key, users_online, timeout=60 * 5)
+        def get_users_online(komunitas):
+            if self.request.user.is_authenticated:
+                if komunitas.members.filter(id=self.request.user.id).exists():
+                    cache_key = f'komunitas_{komunitas.id}_users_online'
+                    users_online = cache.get(cache_key, [])
 
-        users_online_count = len(cache.get(f'komunitas_{komunitas.id}_users_online', []))
-        context["users_online"] = users_online_count
+                    if self.request.user.id not in users_online:
+                        users_online.append(self.request.user.id)
+                        cache.set(cache_key, users_online, timeout=60 * 5)
 
+            users_online_count = len(cache.get(f'komunitas_{komunitas.id}_users_online', []))
+            return users_online_count
+
+        context["users_online"] = get_users_online(komunitas)
         return context
 
 def KomunitasJoinView(request, pk):
@@ -364,8 +368,12 @@ def PertanyaanDeleteView(request, pertanyaan_id):
     if pertanyaan.penulis != request.user:
         return HttpResponseForbidden("Anda tidak memiliki izin untuk menghapus pertanyaan ini.")
 
+    komunitas_id = pertanyaan.komunitas.id
     pertanyaan.delete()
-    url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
+
+    messages.success(request, "Pertanyaan berhasil dihapus.")
+
+    url = reverse('user:komunitas_detail', kwargs={'pk': komunitas_id})
     query_params = urlencode({'scroll_to': 'pertanyaan-list'})
     return redirect(f"{url}?{query_params}")
 
@@ -378,6 +386,7 @@ def PertanyaanUpdateView(request, pertanyaan_id):
     if request.method == 'POST':
         form = PertanyaanForm(request.POST, instance=pertanyaan)
         if form.is_valid():
+            pertanyaan.created_at = timezone.now()
             form.save()
             url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
             query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
@@ -427,25 +436,10 @@ def JawabanPertanyaanDeleteView(request, pertanyaan_id, jawaban_id):
     if jawaban.penulis == request.user:
             jawaban.delete()
 
-    url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
-    query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
-    full_url = f'{url}?{query_params}'
-    return redirect(full_url)
-
-def JawabanPertanyaanUpdateView(request, pertanyaan_id):
-    pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
-
-    if request.method == "POST":
-        jawaban.delete()
-
-        url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
-        query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
-
-        full_url = f'{url}?{query_params}'
-
-        return redirect(full_url)
-
-    return render(request, 'user_cms/jawab_pertanyaan.html', {'pertanyaan': pertanyaan})
+            url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
+            query_params = urlencode({'scroll_to': f'pertanyaan-{pertanyaan.id}'})
+            full_url = f'{url}?{query_params}'
+            return redirect(full_url)
 
 def JawabanPertanyaanUpdateView(request, pertanyaan_id, jawaban_id):
     pertanyaan = get_object_or_404(Pertanyaan, id=pertanyaan_id)
@@ -454,6 +448,7 @@ def JawabanPertanyaanUpdateView(request, pertanyaan_id, jawaban_id):
     if request.method == 'POST':
         jawaban_isi = request.POST.get('isi')
         jawaban.isi = jawaban_isi
+        jawaban.created_at = timezone.now()
         jawaban.save()
 
         url = reverse('user:komunitas_detail', kwargs={'pk': pertanyaan.komunitas.id})
