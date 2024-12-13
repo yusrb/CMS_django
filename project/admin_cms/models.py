@@ -1,7 +1,8 @@
 import os
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Permission
 from django.utils.timezone import timezone
+from django.dispatch import receiver
+from django.contrib.auth.models import AbstractUser, Permission
 
 class User(AbstractUser):
     LEVEL_CHOICES = (
@@ -37,7 +38,6 @@ class User(AbstractUser):
         except User.DoesNotExist:
             pass
 
-        # Set is_superuser dan is_staff berdasarkan level
         if self.level == 'Admin':
             self.is_superuser = True
             self.is_staff = True
@@ -111,8 +111,10 @@ class Komunitas(models.Model):
         ]
 
     def update_pertanyaan_count(self):
-        self.jumlah_pertanyaan = self.pertanyaan_set.count()
+        from user_cms.models import Pertanyaan
+        self.jumlah_pertanyaan = Pertanyaan.objects.filter(komunitas=self).count()
         self.save()
+
 
     def get_pertanyaan_terkait(self):
         return self.pertanyaan_set.all()
@@ -177,6 +179,22 @@ class Konfigurasi(models.Model):
 
     def __str__(self):
         return self.judul_website
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = Konfigurasi.objects.get(pk=self.pk)
+            if old_instance.favicon and old_instance.favicon != self.favicon:
+                old_instance.favicon.delete(save=False)
+            if old_instance.iklan and old_instance.iklan != self.iklan:
+                old_instance.iklan.delete(save=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.favicon:
+            self.favicon.delete(save=False)
+        if self.iklan:
+            self.iklan.delete(save=False)
+        super().delete(*args, **kwargs)
 
 class Galeri(models.Model):
     judul = models.CharField(max_length=60)

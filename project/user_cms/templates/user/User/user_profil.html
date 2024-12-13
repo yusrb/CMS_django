@@ -2,7 +2,7 @@
 
 {% block content %}
 {% include 'snippets/nav.html' %}
-<div class="container-fluid lg:mt-5 pt-3">
+<div class="container-fluid lg:mt-5 pt-3 overflow-hidden">
     <div class="container">
         <div class="row">
             <!-- Profile Start -->
@@ -134,7 +134,7 @@
                                     </a>
                                 </div>
                                 <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="{% url 'user:konten_detail' post.slug %}">{{ post.judul|truncatechars:18 }}</a>
-                                <div class="flex relative left-[13rem]">
+                                <div class="flex relative left-[180px] lg:left-[13rem]">
                                     <small class="ml-3"><i class="far fa-eye mr-[6px]"></i>{{ post.dilihat }}</small>
                                     <small class="ml-[11px]"><i class="far fa-comment mr-[6px]"></i>{{ post.total_komentar }}</small>
                                 </div>

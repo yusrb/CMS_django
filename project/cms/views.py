@@ -1,5 +1,9 @@
+from django.shortcuts import redirect
 from django.contrib.auth import views as auth_views
 from admin_cms.models import Konfigurasi
+
+def admin_redirect(request):
+    return redirect('konten/user_cms/')
 
 class PasswordResetViewCustom(auth_views.PasswordResetView):
     def get_context_data(self, **kwargs):

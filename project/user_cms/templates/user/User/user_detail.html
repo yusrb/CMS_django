@@ -15,19 +15,38 @@
                 </div>
 
                 <div class="row mb-4">
-                    <div class="col-4">
+                    <!-- Foto Profil -->
+                    <div class="col-12 col-lg-4 mb-3 mb-lg-0 text-center overflow-hidden">
                         {% if user.foto %}
-                            <img class="img-fluid rounded-circle" src="{{ user.foto.url }}" style="object-fit: cover; height: 200px; width: 200px;" id="profileImage">
+                            <img class="img-fluid rounded-circle mx-auto" src="{{ user.foto.url }}" style="object-fit: cover; height: 200px; width: 200px;" id="profileImage">
                         {% else %}
-                            <img class="img-fluid rounded-circle" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" style="object-fit: cover; height: 200px; width: 200px;" id="profileImage">
+                            <img class="img-fluid rounded-circle mx-auto" src="https://th.bing.com/th/id/OIP.QIOvRMpkLL16KADaW5mGJwAAAA?w=180&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7" style="object-fit: cover; height: 200px; width: 200px;" id="profileImage">
                         {% endif %}
                     </div>
-                    <div class="col-8">
-                        <h5 class="font-weight-bold"><span class="text-md">@</span>{{ user.username }}</h5>
-                        <p><strong>Nama:</strong> {{ user.nama }}</p>
-                        <p><strong>Email:</strong> {{ user.email }}</p>
-                        <p><strong>Telepon:</strong> {{ user.telepon }}</p>
-                        <p><strong>Tentang:</strong> {{ user.about }}</p>
+
+                    <div class="col-12 col-lg-8">
+                        <div class="d-flex flex-column justify-content-center align-items-start">
+                            <h5 class="font-weight-bold mb-2">
+                                <span class="text-md">@</span>{{ user.username }}
+                            </h5>
+                            <p class="mb-2"><span class="font-bold">Nama:</span> {{ user.nama }}</p>
+                            <p class="mb-2"><span class="font-bold">Email:</span> {{ user.email }}</p>
+                            <p class="mb-2"><span class="font-bold">Telepon:</span> {{ user.telepon }}</p>
+
+                            {% if user.konfigurasi.alamat %}
+                                <p class="mb-2"><span class="font-bold">Alamat:</span> {{ user.konfigurasi.alamat }}</p>
+                            {% else %}
+                                <p class="mb-2"><span class="font-bold">Alamat:</span> Tidak ada alamat yang tersedia.</p>
+                            {% endif %}
+
+                            {% if user.about %}
+                                <p class="mb-2"><span class="font-bold">About:</span>
+                                    <span class="text-sm">{{ user.about }}</span>
+                                </p>
+                            {% else %}
+                                <p class="mb-2"><span class="font-bold">About:</span> Tidak ada bio yang tersedia.</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
@@ -35,7 +54,7 @@
                 <div class="section-title mb-4">
                     <h4 class="m-0 text-uppercase font-weight-bold">Artikel oleh {{ user.username }}</h4>
                 </div>
-                
+
                 <div class="row">
                     {% for konten in kontens %}
                     <div class="col-lg-6 mb-4">
@@ -116,7 +135,7 @@
                                     </a>
                                 </div>
                                 <a class="h6 m-0 text-secondary text-uppercase font-weight-bold" href="{% url 'user:konten_detail' post.slug %}">{{ post.judul|truncatechars:18 }}</a>
-                                <div class="flex relative left-[13rem]">
+                                <div class="flex relative left-[180px] lg:left-[13rem]">
                                     <small class="ml-3"><i class="far fa-eye mr-[6px]"></i>{{ post.dilihat }}</small>
                                     <small class="ml-[11px]"><i class="far fa-comment mr-[6px]"></i>{{ post.total_komentar }}</small>
                                 </div>

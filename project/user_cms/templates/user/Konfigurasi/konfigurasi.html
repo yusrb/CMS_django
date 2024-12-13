@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mx-auto p-8 bg-white rounded-lg shadow-xl relative">
-  <!-- Header Section -->
+<div class="container mx-auto p-8 bg-white rounded-lg shadow-xl relative px-3 lg:px-0">
   <div class="text-center mb-8">
-    <h2 class="text-4xl font-extrabold text-amber-500 mb-2">
+    <h2 class="lg:text-4xl text-2xl font-extrabold text-amber-500 mb-2">
       <i class="bx bxs-cog bx-spin text-amber-500"></i> Pengaturan Konfigurasi
     </h2>
     <p class="text-gray-700">
@@ -12,11 +11,9 @@
     </p>
   </div>
 
-  <!-- Configuration Form -->
   <form method="post" class="space-y-8" id="configForm">
     {% csrf_token %}
 
-    <!-- Configuration Fields -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       {% for field in form %}
       <div
@@ -48,7 +45,6 @@
       {% endfor %}
     </div>
 
-    <!-- Submit Button -->
     <div class="flex justify-center mt-6">
       <button
         type="submit"
@@ -67,7 +63,6 @@
   </form>
 </div>
 
-<!-- Pop-Up Confirmation Modal -->
 <div
   id="confirmationModal"
   class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 hidden"

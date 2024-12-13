@@ -53,6 +53,8 @@ urlpatterns = [
 
     path('komunitas/', KomunitasListView.as_view(), name="komunitas_list"),
     path('komunitas/<int:pk>/', KomunitasDetailView.as_view(), name='komunitas_detail'),
+    path('komunitas/<int:pk>/remove_online/', KomunitasDetailView.as_view(), name='remove_online'),
+    path('komunitas/<int:pk>/heartbeat/', KomunitasDetailView.as_view(), name='heartbeat'),
     path('komunitas/join/<int:pk>', KomunitasJoinView, name='komunitas_join'),
     path('komunitas/keluar/<int:pk>', KomunitasKeluarView, name="komunitas_keluar"),
 

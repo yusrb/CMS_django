@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="flex items-start justify-center min-h-screen bg-gradient-to-r from-yellow-400 to-yellow-200 py-12 px-2">
+<div class="flex items-start justify-center min-h-screen bg-gradient-to-br from-orange-400 to-yellow-300 py-12 px-2">
     <div class="bg-white shadow-md rounded-lg p-8 w-full max-w-lg">
         <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Register an Account</h2>
 
@@ -21,7 +21,7 @@
             
             <div class="mb-4">
                 <label for="nama" class="block text-sm font-semibold text-gray-400 mb-1">Nama</label>
-                <input type="text" name="nama" id="nama" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                <input type="text" name="nama" id="nama" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-yellow-300" required>
                 {% if form.nama.errors %}
                     <div class="text-red-400 text-sm mt-1">
                         {% for error in form.nama.errors %}
@@ -33,7 +33,7 @@
 
             <div class="mb-4">
                 <label for="username" class="block text-sm font-semibold text-gray-400 mb-1">Username</label>
-                <input type="text" name="username" id="username" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                <input type="text" name="username" id="username" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-yellow-300" required>
                 {% if form.username.errors %}
                     <div class="text-red-400 text-sm mt-1">
                         {% for error in form.username.errors %}
@@ -45,7 +45,7 @@
 
             <div class="mb-4">
                 <label for="email" class="block text-sm font-semibold text-gray-400 mb-1">Email</label>
-                <input type="email" name="email" id="email" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                <input type="email" name="email" id="email" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-yellow-300" required>
                 {% if form.email.errors %}
                     <div class="text-red-400 text-sm mt-1">
                         {% for error in form.email.errors %}
@@ -57,7 +57,7 @@
 
             <div class="mb-4">
                 <label for="password1" class="block text-sm font-semibold text-gray-400 mb-1">Password</label>
-                <input type="password" name="password1" id="password1" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                <input type="password" name="password1" id="password1" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-yellow-300" required>
                 {% if form.password1.errors %}
                     <div class="text-red-400 text-sm mt-1">
                         {% for error in form.password1.errors %}
@@ -69,7 +69,7 @@
 
             <div class="mb-4">
                 <label for="password2" class="block text-sm font-semibold text-gray-400 mb-1">Confirm Password</label>
-                <input type="password" name="password2" id="password2" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                <input type="password" name="password2" id="password2" class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-yellow-300" required>
                 {% if form.password2.errors %}
                     <div class="text-red-400 text-sm mt-1">
                         {% for error in form.password2.errors %}
@@ -79,10 +79,10 @@
                 {% endif %}
             </div>
 
-            <button type="submit" class="w-full bg-yellow-400 text-white py-3 rounded-lg shadow-lg hover:bg-yellow-500 transition duration-200">Register</button>
+            <button type="submit" class="w-full bg-orange-400 text-white py-3 rounded-lg shadow-lg hover:bg-orange-400 transition duration-200">Register</button>
         </form>
 
-        <p class="mt-6 text-center text-gray-600 text-sm">Already have an account? <a href="{% url 'user:user_login' %}" class="text-yellow-400 hover:underline">Login</a>.</p>
+        <p class="mt-6 text-center text-gray-600 text-sm">Sudah punya akun? <a href="{% url 'user:user_login' %}" class="text-orange-400 hover:underline">Login</a>.</p>
     </div>
 </div>
 {% endblock %}

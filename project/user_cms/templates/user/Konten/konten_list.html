@@ -34,7 +34,7 @@
                             <img class="img-fluid w-100 h-100" src="{{konten.foto.url}}" style="object-fit: cover;">
                             <div class="overlay">
                                 <div class="mb-2">
-                                    <a class="bg-yellow-300 text-black uppercase text-[10px] font-medium px-1.5 py-1 mr-1"
+                                    <a class="bg-yellow-400 text-black uppercase text-[10px] font-medium px-1.5 py-1 mr-1"
                                         href="{% url 'user:kategori_detail' konten.kategori.pk %}">
                                         {{ konten.kategori }}
                                         </a>
@@ -59,7 +59,7 @@
             <div class="row align-items-center bg-dark">
                 <div class="col-12">
                     <div class="d-flex justify-content-between">
-                        <div class="lg:bg-primary  bg-yellow-300 text-dark text-center rounded lg:rounded-none text-sm md:text-md font-semibold py-2 w-[90px] lg:w-[170px] mx-auto">
+                        <div class="lg:bg-primary  bg-yellow-400 text-dark text-center rounded lg:rounded-none text-sm md:text-md font-semibold py-2 w-[90px] lg:w-[170px] mx-auto">
                             Stage Spotlight
                         </div>
                         <div class="owl-carousel tranding-carousel position-relative d-inline-flex align-items-center ml-3"
@@ -85,7 +85,7 @@
             <div class="section-title" data-aos="fade-up" data-aos-duration="1000">
                 <h4 class="m-0 text-uppercase font-weight-bold">Top News</h4>
             </div>
-            <div class="owl-carousel news-carousel carousel-item-4 position-relative">
+            <div class="owl-carousel news-carousel carousel-item-4 position-relative" data-aos="fade-up" data-aos-duration="1000">
                 {% for post in top_posts %}
                     {% if forloop.counter0 < 1 %}
                         <div class="position-relative overflow-hidden" style="height: 300px;" data-aos="fade-right" data-aos-duration="2000">
@@ -95,7 +95,7 @@
                             <img class="img-fluid h-100" src="{{ post.foto.url }}" style="object-fit: cover;">
                             <div class="overlay">
                                 <div class="mb-2">
-                                    <a class="p-2 text-[8.9px] text-black font-semibold hover:text-black hover:no-underline hover:opacity-90 bg-yellow-300" href="{% url 'user:kategori_detail' post.kategori.pk %}">
+                                    <a class="p-2 text-[8.9px] text-black font-semibold hover:text-black hover:no-underline hover:opacity-90 bg-yellow-400" href="{% url 'user:kategori_detail' post.kategori.pk %}">
                                         {{ post.kategori }}
                                     </a>
                                     <a class="text-white" href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ post.tanggal|date:'Y-m-d' }}">
@@ -173,10 +173,10 @@
                     {% endfor %}
 
                         <div class="col-lg-12 mb-3" id="konten-list">
-                            {% if konfigurasi_home.iklan %}
-                            <a href="{{konfigurasi_home.url_iklan}}" class="cursor-pointer"><img class="w-full h-[150px]" style="background-position: cover;" data-aos="fade-up" data-aos-duration="2000" src="{{konfigurasi_home.iklan.url}}" alt=""></a>
+                            {% if konfigurasi_home.iklan and konfigurasi_home.iklan.url %}
+                            <a href="{{konfigurasi_home.url_iklan}}" target="__blank" class="cursor-pointer"><img class="w-full h-[180px]" style="background-position: cover;" data-aos="fade-up" data-aos-duration="2000" src="{{konfigurasi_home.iklan.url}}" alt=""></a>
                             {% else %}
-                             <a href="https://wa.link/ y2425f" class="cursor-pointer" target="_blank"><img class="w-full h-[150px]" style="background-position: cover;" data-aos="fade-up" data-aos-duration="2000" src="https://1.bp.blogspot.com/-cuxldiexuRc/WBrRyBUEWNI/AAAAAAAABr4/UwKfgNlkjb4V8acyV1UMqg34fHUH8PidQCLcB/s1600/pasang-iklan-banner.jpg" alt=""></a>
+                            <a href="https://wa.link/y2425f" class="cursor-pointer" target="_blank"><img class="w-full h-[150px]" style="background-position: cover;" data-aos="fade-up" data-aos-duration="2000" src="{% static 'img/pasang_iklan.jpg' %}" alt=""></a>
                             {% endif %}
                         </div>
                         {% for konten in kontens_random %}

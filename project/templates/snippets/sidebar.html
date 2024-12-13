@@ -69,7 +69,7 @@
                         <a class="badge badge-primary text-uppercase font-weight-semi-bold p-1 mr-2"
                             href="{% url 'user:kategori_detail' post.kategori.pk %}">{{ post.kategori }}</a>
                         <a class="text-body"
-                            href="{% url 'user:konten_tanggal_list' %}"><small>{{ post.tanggal|date:"d M, Y" }}</small></a>
+                            href="{% url 'user:konten_tanggal_list' %}#tanggal-{{ post.tanggal|date:'Y-m-d' }}"><small>{{ post.tanggal|date:"d M, Y" }}</small></a>
                     </div>
                     <a class="h6 m-0 text-secondary text-uppercase font-weight-bold"
                         href="{% url 'user:konten_detail' post.slug %}">{{ post.judul|truncatechars:18 }}</a>

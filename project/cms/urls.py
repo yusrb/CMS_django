@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path , include
 from django.conf import settings
+from .views import admin_redirect
 from django.conf.urls.static import static
 from .views import PasswordResetViewCustom, PasswordResetDoneViewCustom, PasswordResetConfirmViewCustom, PasswordResetCompleteViewCustom
 
@@ -14,5 +15,7 @@ urlpatterns = [
     path('password_reset_confirm/<uidb64>/<token>', PasswordResetConfirmViewCustom.as_view(template_name="user/password_reset_confirm.html"), name="password_reset_confirm"),
     path('password_reset_complete', PasswordResetCompleteViewCustom.as_view(template_name="user/password_reset_complete.html"), name="password_reset_complete"),
     path('admins/' , include(('admin_cms.urls' , 'admin_cms') , namespace="admins")),
+
+    path('admin/user_cms/konten', admin_redirect, name='user_cms_konten'),
     path("__reload__/", include("django_browser_reload.urls")),
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

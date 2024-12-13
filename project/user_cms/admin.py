@@ -85,6 +85,7 @@ class KontenAdmin(admin.ModelAdmin):
 # ===============================
 
 class KonfigurasiAdmin(admin.ModelAdmin):
+    list_display = ('judul_website', 'email', 'alamat', 'user')
     readonly_fields = ['tampil_user']
 
     fieldsets = (
@@ -92,7 +93,7 @@ class KonfigurasiAdmin(admin.ModelAdmin):
             'fields': ('tampil_user',),
         }),
         ('Informasi Website', {
-            'fields': ('judul_website', 'x', 'instagram', 'linkedin', 'facebook', 'tiktok', 'alamat', 'email', 'iklan', 'url_iklan')
+            'fields': ('judul_website', 'favicon' , 'x', 'instagram', 'linkedin', 'facebook', 'tiktok', 'alamat', 'email', 'iklan', 'url_iklan')
         }),
     )
 
@@ -173,7 +174,7 @@ class KomunitasAdmin(admin.ModelAdmin):
 
 @admin.register(Pertanyaan)
 class PertanyaanAdmin(admin.ModelAdmin):
-    list_display = ('judul', 'komunitas', 'created_at', 'penulis')
+    list_display = ('judul', 'komunitas', 'penulis')
     ordering = ['created_at']
 
     def komunitas(self, obj):

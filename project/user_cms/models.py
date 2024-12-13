@@ -89,7 +89,7 @@ class Komen(models.Model):
         verbose_name_plural = "Komen User"
 
     def __str__(self):
-        return self.user.username
+        return f'{self.user.username} - {self.konten.judul}'
 
 class Balasan(models.Model):
     komen = models.ForeignKey(Komen, related_name='replies', on_delete=models.CASCADE)

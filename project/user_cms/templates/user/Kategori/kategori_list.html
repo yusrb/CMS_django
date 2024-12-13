@@ -12,7 +12,7 @@
                 <div class="col-lg-8">
                     {% for kategori in kategoris %}
                         <div class="section-title mb-4" data-aos-duration="1100" data-aos="fade-up">
-                            <h4 class="m-0 text-uppercase font-weight-bold">{{ kategori.kategori }}</h4>
+                            <h4 class="m-0 text-uppercase text-[16px] lg:text-[22px] font-weight-bold">{{ kategori.kategori }}</h4>
                             <a class="text-secondary font-weight-medium text-decoration-none" href="{% url 'user:kategori_detail' kategori.pk %}">View All</a>
                         </div>
 

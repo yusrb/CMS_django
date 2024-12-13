@@ -6,6 +6,8 @@ from django.shortcuts import (
 )
 from django.http import HttpResponseForbidden, HttpResponse, JsonResponse
 from django.core.cache import cache
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.core.paginator import Paginator
 from urllib.parse import urlencode
 from typing import Any
@@ -137,6 +139,10 @@ class UserProfilView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
 
+        if not self.request.user.is_authenticated:
+            messages.error(self.request, "Anda harus login terlebih dahulu jika ingin masuk profil.")
+            return redirect('user:user_login')
+
         search_input = self.request.GET.get('q')
 
         if search_input:
@@ -156,7 +162,7 @@ class UserProfilView(LoginRequiredMixin, DetailView):
         context["judul"] = 'Profil User'
         context['top_posts'] = Konten.objects.filter(user=self.get_object().pk).order_by('-dilihat')[:5].annotate(total_komentar=Count('komentar') + Count('komentar__replies'))
         context["kategoris"] = Kategori.objects.all()
-        context["konfigurasi"] = Konfigurasi.objects.filter(user = self.request.user)
+        context["konfigurasi"] = Konfigurasi.objects.filter(user=self.request.user)
         context["konfigurasi_home"] = Konfigurasi.objects.filter(user_id=1).first()
         context["design_user"] = get_object_or_404(User, pk=1)
         context['search_input'] = search_input
@@ -271,6 +277,16 @@ class KomunitasDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        search_input = self.request.GET.get('q')
+
+        if search_input:
+            context['komunitas'] = Konten.objects.filter(
+                Q(nama__icontains=search_input)
+            )
+        else:
+            context['komunitas'] = random.sample(list(get_konten), min(len(get_konten), 6))
+
         komunitas = self.get_object()
         context["judul"] = komunitas.nama
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
@@ -279,8 +295,8 @@ class KomunitasDetailView(DetailView):
         context["design_user"] = get_object_or_404(User, pk=1)
         context['pertanyaan_list'] = komunitas.get_pertanyaan_terkait().order_by('-created_at')
         context["form"] = PertanyaanForm()
-        context['peraturans'] = PeraturanKomunitas.objects.filter(komunitas = self.get_object().id)
-        context['bookmarks'] = Bookmarks.objects.filter(komunitas = self.get_object().id)
+        context['peraturans'] = PeraturanKomunitas.objects.filter(komunitas=self.get_object().id)
+        context['bookmarks'] = Bookmarks.objects.filter(komunitas=self.get_object().id)
 
         def get_users_online(komunitas):
             if self.request.user.is_authenticated:
@@ -297,6 +313,20 @@ class KomunitasDetailView(DetailView):
 
         context["users_online"] = get_users_online(komunitas)
         return context
+
+    @method_decorator(csrf_exempt)
+    def post(self, request, *args, **kwargs):
+        """Handle AJAX requests to remove user from online list."""
+        komunitas = self.get_object()
+        if self.request.user.is_authenticated:
+            cache_key = f'komunitas_{komunitas.id}_users_online'
+            users_online = cache.get(cache_key, [])
+
+            if self.request.user.id in users_online:
+                users_online.remove(self.request.user.id)
+                cache.set(cache_key, users_online, timeout=60 * 5)
+
+        return JsonResponse({"success": True})
 
 def KomunitasJoinView(request, pk):
     if not request.user.is_authenticated:
@@ -536,24 +566,22 @@ class KontenLatestListView(ListView):
         if search_input:
             kontens = Konten.objects.filter(judul__icontains=search_input).annotate(
                 total_komentar=Count('komentar') + Count('komentar__replies')
-            ).distinct()
+            ).order_by('-tanggal').distinct()
         else:
             kontens = Konten.objects.all().annotate(
                 total_komentar=Count('komentar') + Count('komentar__replies')
-            )
+            ).order_by('-tanggal')
 
-        # Paginasi
         paginator = Paginator(kontens, self.paginate_by)
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
         context['kontens'] = page_obj
         context['page_obj'] = page_obj
-        context["judul"] = 'Daftar Konten Latest'
+        context["judul"] = 'Daftar Konten Terbaru'
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context["kategoris"] = Kategori.objects.all()
         context["konfigurasi_home"] = Konfigurasi.objects.filter(user_id=1).first()
-        context["design_user"] = get_object_or_404(User, username=self.request.user.username)
 
         return context
 
@@ -581,7 +609,7 @@ class KontenTanggalListView(ListView):
         for konten in kontens:
             konten_date = konten.tanggal.date()
 
-            konten_date = konten_date.replace(day=konten_date.day + 1)  
+            konten_date = konten_date.replace(day=konten_date.day)
 
             if konten_date not in konten_grouped:
                 konten_grouped[konten_date] = []

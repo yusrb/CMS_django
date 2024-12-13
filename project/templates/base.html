@@ -23,18 +23,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
 
-
-    {% if theme.favicon %}
-        <link rel="icon" href="{{ theme.favicon.url }}">
-        {% if theme.env_visible_in_favicon %}
-            <script
-                src="{% static 'admin_interface/favico/favico-0.3.10-patched.min.js' %}?nocache={{ version_md5_cache }}"></script>
-            <script>
-                var favicon = new Favico({type: 'circle', bgColor: '{{ theme.env_color }}', textColor: '#FFFFFF', animation: 'none'});
-                favicon.badge(' ');
-            </script>
-        {% endif %}
-    {% endif %}
+    {% tailwind_css %}
 
     <!-- Font Awesome -->
     <link
@@ -46,15 +35,21 @@
         href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}"
         rel="stylesheet">
 
+    <link rel="shortcut icon" href="{{ konfigurasi_home.favicon.url }}" type="image/x-icon" sizes="64x64">
+
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="https://unpkg.com/iro.js"></script>
-
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
-    <body style="background-color: {{ konfigurasis.body_page_color }};">
+<body>
         {% block content %}{% endblock content %}
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>

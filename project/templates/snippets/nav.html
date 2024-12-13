@@ -12,7 +12,7 @@
                     <li class="nav-item border-right border-secondary">
                         <a class="nav-link text-body small" href="{% url 'user:contact' %}">Contact</a>
                     </li>
-                    <li class="nav-item">    
+                    <li class="nav-item">
                         {% if user.is_authenticated %}
                         <form action="{% url 'user:user_logout' %}" method="post">
                             {% csrf_token %}
@@ -85,9 +85,9 @@
 
 <!-- Navbar Start -->
 <div class="container-fluid p-0">
-    <nav class="bg-dark text-white z-50 relative py-[10px] px-4 py-sm-3 py-md-2">
-        <div class="flex justify-between items-center">
-            <a href="user:konten_list" class="text-primary font-bold text-2xl flex lg:hidden lg:text-3xl">
+    <nav class="bg-dark text-white z-50 relative py-[10px] py-sm-3 py-md-2">
+        <div class="flex justify-between items-center px-4">
+            <a href="user:konten_list" class="text-primary text-uppercase font-bold text-2xl flex lg:hidden lg:text-3xl">
                 {{konfigurasi_home.judul_website}}<span class="text-white">CMS</span>
             </a>
 
@@ -107,12 +107,12 @@
                 </div>
                 <!-- Search bar -->
                 <div class="hidden lg:flex items-center max-w-xs">
-                    <form method="get" 
+                    <form method="get"
                         action="{% if request.path == '/' %}
                                     {% url 'user:konten_list' %}
                                 {% elif request.path == '/kategori/' %}
                                     {% url 'user:kategori_list' %}
-                        {% endif %}" 
+                        {% endif %}"
                         class="flex w-full">
                         <input type="text" id="search-bar" name="q" class="form-input w-full bg-gray-800 text-white border-none focus:ring-0 rounded-l-lg" placeholder="Keyword">
                         <button type="submit" class="bg-primary text-white px-3 rounded-r-lg focus:outline-none">
@@ -127,12 +127,37 @@
 
         <div class="hidden lg:hidden mt-2" id="mobile-dropdown">
             <ul class="bg-gray-800 text-white space-y-2 py-2 px-4 rounded-lg">
+                <!-- Search Bar -->
+                <li>
+                    <form method="get"
+                        action="{% if request.path == '/' %}
+                                    {% url 'user:konten_list' %}
+                                {% elif request.path == '/kategori/' %}
+                                    {% url 'user:kategori_list' %}
+                        {% endif %}"
+                        class="flex w-full">
+                        <input type="text" id="search-bar" name="q" 
+                            class="form-input w-full bg-gray-700 text-white border-none focus:ring-0 rounded-l-lg text-sm"
+                            placeholder="Search...">
+                        <button type="submit" 
+                            class="bg-primary text-white px-3 rounded-r-lg focus:outline-none">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l-3-3 3-3m13 0h-7m0 0V4m0 9l3 3-3 3"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </li>
+        
+                <!-- Navigation Links -->
                 <li><a href="{% url 'user:konten_list' %}" class="block text-white hover:text-gray-400">Home</a></li>
-                <li><a href="{% url 'user:kategori_list' %}" class="block text-white hover:text-gray-400">Category</a>
-                </li>
-                <li><a href="{% url 'user:komunitas_list' %}" class="block text-white hover:text-gray-400">Community</a>
-                </li>
+                <li><a href="{% url 'user:kategori_list' %}" class="block text-white hover:text-gray-400">Category</a></li>
+                <li><a href="{% url 'user:komunitas_list' %}" class="block text-white hover:text-gray-400">Community</a></li>
                 <li><a href="{% url 'user:contact' %}" class="block text-white hover:text-gray-400">Contact</a></li>
+                {% if request.user.is_authenticated %}
+                    <li>
+                        <a class="block text-white hover:text-gray-400" href="{% url 'user_cms_konten' %}" target="_self">Manage</a>
+                    </li>
+                {% endif %}
                 <li>
                     {% if request.user.is_authenticated %}
                     <a class="block text-white hover:text-gray-400" href="{% url 'user:user_profil' request.user.pk %}">
@@ -140,7 +165,6 @@
                     </a>
                     {% endif %}
                 </li>
-
                 {% if user.is_authenticated %}
                     <li>
                         <form action="{% url 'user:user_logout' %}" method="post">
