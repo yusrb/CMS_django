@@ -22,21 +22,27 @@
                                         <i class="fa fa-map-marker-alt text-primary mr-2"></i>
                                         <h6 class="font-weight-bold mb-0">Our Office</h6>
                                     </div>
-                                    <p class="m-0">{{konfigurasi_home.alamat}}</p>
+                                    <a href="{{konfigurasi_home.url_alamat}}" target="__blank">
+                                        <p class="m-0">{{konfigurasi_home.alamat}}</p>
+                                    </a>
                                 </div>
                                 <div class="mb-3">
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fa fa-envelope-open text-primary mr-2"></i>
                                         <h6 class="font-weight-bold mb-0">Email Us</h6>
                                     </div>
-                                    <p class="m-0">{{konfigurasi_home.email}}</p>
+                                    <a href="mailto:{{konfigurasi_home.email}}">
+                                        <p class="m-0">{{konfigurasi_home.email}}</p>
+                                    </a>
                                 </div>
                                 <div class="mb-3">
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="fa fa-phone-alt text-primary mr-2"></i>
                                         <h6 class="font-weight-bold mb-0">Call Us</h6>
                                     </div>
-                                    <p class="m-0">{{konfigurasi_home.user.telepon}}</p>
+                                    <a href="tel:{{konfigurasi_home.user.telepon}}">
+                                        <p class="m-0">{{konfigurasi_home.user.telepon}}</p>
+                                    </a>
                                 </div>
                         </div>
 

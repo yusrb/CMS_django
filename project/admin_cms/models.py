@@ -56,8 +56,9 @@ class User(AbstractUser):
             ]
 
             for perm in permissions:
-                permission = Permission.objects.get(codename=perm)
-                self.user_permissions.add(permission)
+                permission = Permission.objects.filter(codename=perm, content_type_id=4).first()
+                if permission:
+                    self.user_permissions.add(permission)
 
 class PeraturanKomunitas(models.Model):
     komunitas = models.ForeignKey('Komunitas', on_delete=models.CASCADE, related_name='peraturan_komunitas')
@@ -146,7 +147,6 @@ class Kategori(models.Model):
     def __str__(self):
         return self.kategori
 
-
 class KontenDilihat(models.Model):
     konten = models.ForeignKey('user_cms.Konten', related_name="dilihats", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -167,6 +167,7 @@ class Konfigurasi(models.Model):
     linkedin = models.CharField(max_length=100 , blank=True , null=True)
     tiktok = models.CharField(max_length=50 , blank=True , null=True)
     alamat = models.CharField(max_length=50)
+    url_alamat = models.CharField(max_length=250)
     email = models.CharField(max_length=50)
 
     iklan = models.ImageField(upload_to="gambar_iklan/", blank=True, null=True, help_text="Masukkan Gambar yang telah disepakati")
@@ -195,15 +196,3 @@ class Konfigurasi(models.Model):
         if self.iklan:
             self.iklan.delete(save=False)
         super().delete(*args, **kwargs)
-
-class Galeri(models.Model):
-    judul = models.CharField(max_length=60)
-    foto = models.ImageField(upload_to="galeri_foto/")
-    tanggal = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Galeri"
-        verbose_name_plural = "Galeri"
-
-    def __str__(self):
-        return self.judul

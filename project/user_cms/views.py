@@ -30,11 +30,11 @@ from django.contrib.auth.views import (
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.timezone import localtime
 from django.core.mail import send_mail
 from django.db.models import Q, Count
 from admin_cms.models import (
     User,
-    Galeri,
     Kategori,
     Konfigurasi,
     KontenDilihat,
@@ -49,6 +49,7 @@ from user_cms.models import (
     Balasan,
     Pertanyaan,
     Jawaban,
+    Galeri,
 )
 from .forms import (
     LevelChoiceForm,
@@ -246,26 +247,28 @@ class KomunitasListView(ListView):
     template_name = "user/Komunitas/komunitas_list.html"
     context_object_name = 'komunitas'
 
-    def get_queryset(self):
-        search_input = self.request.GET.get('q', '')
-
-        if search_input:
-            return Komunitas.objects.filter(
-                Q(nama__icontains=search_input) | Q(deskripsi__icontains=search_input), status=True
-            )
-        else:
-            return Komunitas.objects.filter(status=True)
-
     def get_context_data(self, **kwargs):
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
+
         context = super().get_context_data(**kwargs)
         context['judul'] = "Komunitas"
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
         context["komunitass"] = Komunitas.objects.filter(status=True)
+        context['galeris'] = sampled_galeris
         context["design_user"] = get_object_or_404(User, pk=1)
 
         search_input = self.request.GET.get('q', '')
+
+        if search_input:
+            context['komunitass'] = Komunitas.objects.filter(
+                Q(nama__icontains=search_input) | Q(deskripsi__icontains=search_input), status=True
+            )
+        else:
+            context['komunitass'] = Komunitas.objects.filter(status=True)
+
         context['search_input'] = search_input
 
         return context
@@ -280,12 +283,8 @@ class KomunitasDetailView(DetailView):
 
         search_input = self.request.GET.get('q')
 
-        if search_input:
-            context['komunitas'] = Konten.objects.filter(
-                Q(nama__icontains=search_input)
-            )
-        else:
-            context['komunitas'] = random.sample(list(get_konten), min(len(get_konten), 6))
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
 
         komunitas = self.get_object()
         context["judul"] = komunitas.nama
@@ -295,6 +294,7 @@ class KomunitasDetailView(DetailView):
         context["design_user"] = get_object_or_404(User, pk=1)
         context['pertanyaan_list'] = komunitas.get_pertanyaan_terkait().order_by('-created_at')
         context["form"] = PertanyaanForm()
+        context['galeris'] = sampled_galeris
         context['peraturans'] = PeraturanKomunitas.objects.filter(komunitas=self.get_object().id)
         context['bookmarks'] = Bookmarks.objects.filter(komunitas=self.get_object().id)
 
@@ -495,12 +495,17 @@ class ContactView(ListView):
     template_name = 'user/Kontak/contact.html'
     context_object_name = 'konfigurasi'
 
+
     def get_context_data(self, **kwargs) -> dict[str, Any]:
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
+
         context = super().get_context_data(**kwargs)
         context["judul"] = 'Contact Page'
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["kategoris"] = Kategori.objects.all()
+        context['galeris'] = sampled_galeris
         context["design_user"] = get_object_or_404(User, pk=1)
         return context
 
@@ -536,6 +541,9 @@ class KontenListView(ListView):
         else:
             konten_random_carousel = random.sample(list(get_konten), min(len(get_konten), 6))
 
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
+
         context["judul"] = "Daftar Konten"
         context['kontens_random_carousel'] = konten_random_carousel
         context['kontens_random'] = konten_random
@@ -546,7 +554,7 @@ class KontenListView(ListView):
         context['top_posts'] = Konten.objects.order_by('-dilihat').annotate(total_komentar=Count("komentar"))[:5]
         # context['konfigurasis'] = Konfigurasi.objects.filter(user=self.request.user)
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
-        context['galeris'] = Galeri.objects.all()
+        context['galeris'] = sampled_galeris
         context['search_input'] = search_input
         context["design_user"] = get_object_or_404(User, pk=1)
 
@@ -576,11 +584,16 @@ class KontenLatestListView(ListView):
         page_number = self.request.GET.get('page')
         page_obj = paginator.get_page(page_number)
 
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
+
         context['kontens'] = page_obj
         context['page_obj'] = page_obj
         context["judul"] = 'Daftar Konten Terbaru'
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context["kategoris"] = Kategori.objects.all()
+        context['search_input'] = search_input
+        context['galeris'] = sampled_galeris
         context["konfigurasi_home"] = Konfigurasi.objects.filter(user_id=1).first()
 
         return context
@@ -607,13 +620,13 @@ class KontenTanggalListView(ListView):
 
         konten_grouped = {}
         for konten in kontens:
-            konten_date = konten.tanggal.date()
-
-            konten_date = konten_date.replace(day=konten_date.day)
-
+            konten_date = localtime(konten.tanggal).date()
             if konten_date not in konten_grouped:
                 konten_grouped[konten_date] = []
             konten_grouped[konten_date].append(konten)
+
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
 
         context['konten_grouped'] = konten_grouped
         context['search_input'] = search_input
@@ -621,6 +634,7 @@ class KontenTanggalListView(ListView):
         context['kategoris'] = Kategori.objects.all()
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context["judul"] = 'Daftar Konten Berdasarkan Tanggal'
+        context['galeris'] = sampled_galeris
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
 
         return context
@@ -652,10 +666,15 @@ class KategoriListView(ListView):
                 total_komentar=Count('komentar') + Count('komentar__replies')
             ).order_by('-tanggal')[:4]
 
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
+
         context["judul"] = 'Daftar Kategori'
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["design_user"] = get_object_or_404(User, pk=1)
+        context['search_input'] = search_input
+        context['galeris'] = sampled_galeris
         context['search_input'] = search_input
 
         return context
@@ -685,12 +704,16 @@ class KategoriDetailView(DetailView):
                 total_komentar=Count('komentar') + Count('komentar__replies')
             )
 
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
+
         context["judul"] = kategori_obj.kategori
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context["kategoris"] = Kategori.objects.all()
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
         context["design_user"] = get_object_or_404(User, pk=1)
         context['search_input'] = search_input
+        context['galeris'] = sampled_galeris
         return context
 class KontenDetailView(DetailView):
     model = Konten
@@ -711,7 +734,7 @@ class KontenDetailView(DetailView):
                 konten.save()
 
                 KontenDilihat.objects.create(konten=konten, user=request.user)
-    
+
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -722,6 +745,9 @@ class KontenDetailView(DetailView):
         total_balasan = Balasan.objects.filter(komen__in=komentar_queryset).count()
         total_komentar += total_balasan
 
+        total_galeris = Galeri.objects.all()
+        sampled_galeris = random.sample(list(total_galeris), min(len(total_galeris), 5))
+
         context["judul"] = self.get_object().judul
         context['kontens'] = Konten.objects.all()
         context['kategoris'] = Kategori.objects.all()
@@ -730,6 +756,7 @@ class KontenDetailView(DetailView):
         context['top_posts'] = Konten.objects.order_by('-dilihat')[:5]
         context['konfigurasis'] = Konfigurasi.objects.filter(user_id=self.request.user.pk)
         context["design_user"] = get_object_or_404(User, pk=1)
+        context['galeris'] = sampled_galeris
         context['konfigurasi_home'] = Konfigurasi.objects.filter(user_id=1).first()
 
         context['komentar'] = self.object.komentar.all()
@@ -805,6 +832,7 @@ class KomentarUpdateView(View):
             return redirect(reverse('user:konten_detail', kwargs={'slug': konten.slug}) + '?hash=#komen-error')
 
         parent_komen.pesan = request.POST.get('pesan')
+        parent_komen.created_at = timezone.now()
         parent_komen.save()
 
         return redirect(f"{reverse('user:konten_detail', kwargs={'slug': konten.slug})}?hash=#komen-{parent_komen.id}")

@@ -7,7 +7,7 @@
                         <a class="nav-link text-body small" href="{% url 'user:konten_list' %}">{% now "l, j F, Y" %}</a>
                     </li>
                     <li class="nav-item border-right border-secondary">
-                        <a class="nav-link text-body small" href="/manage/" target="_self">Manage</a>
+                        <a class="nav-link text-body small" href="../../admin/user_cms/konten" target="__blank">Manage</a>
                     </li>
                     <li class="nav-item border-right border-secondary">
                         <a class="nav-link text-body small" href="{% url 'user:contact' %}">Contact</a>
@@ -155,7 +155,7 @@
                 <li><a href="{% url 'user:contact' %}" class="block text-white hover:text-gray-400">Contact</a></li>
                 {% if request.user.is_authenticated %}
                     <li>
-                        <a class="block text-white hover:text-gray-400" href="{% url 'user_cms_konten' %}" target="_self">Manage</a>
+                        <a class="block text-white hover:text-gray-400" href="../../admin/user_cms/konten" target="_self">Manage</a>
                     </li>
                 {% endif %}
                 <li>

@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
 from django.utils.timezone import localtime
 from django.utils.html import format_html
-from admin_cms.models import User, Aktivitas, Kategori, Konfigurasi, Galeri, Komunitas, PeraturanKomunitas, Bookmarks
-from user_cms.models import Konten, Saran, Komen, Balasan, Pertanyaan, Jawaban
+from admin_cms.models import User, Aktivitas, Kategori, Konfigurasi, Komunitas, PeraturanKomunitas, Bookmarks
+from user_cms.models import Konten, Saran, Komen, Balasan, Pertanyaan, Jawaban, Galeri
 
 # ===============================
 # User Admin
@@ -93,7 +93,7 @@ class KonfigurasiAdmin(admin.ModelAdmin):
             'fields': ('tampil_user',),
         }),
         ('Informasi Website', {
-            'fields': ('judul_website', 'favicon' , 'x', 'instagram', 'linkedin', 'facebook', 'tiktok', 'alamat', 'email', 'iklan', 'url_iklan')
+            'fields': ('judul_website', 'favicon' , 'x', 'instagram', 'linkedin', 'facebook', 'tiktok', 'alamat', 'url_alamat','email', 'iklan', 'url_iklan')
         }),
     )
 
@@ -141,33 +141,6 @@ class KomunitasAdmin(admin.ModelAdmin):
     readonly_fields = ['jumlah_pertanyaan']
     ordering = ('-tanggal',)
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs if request.user.is_superuser else qs.filter(user=request.user)
-
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.user = request.user
-        super().save_model(request, obj, form, change)
-
-    def has_add_permission(self, request):
-        return request.user.is_authenticated
-
-    def has_change_permission(self, request, obj=None):
-        if obj:
-            return obj.user == request.user or request.user.is_superuser
-        return request.user.is_superuser
-
-    def has_delete_permission(self, request, obj=None):
-        if obj:
-            return obj.user == request.user or request.user.is_superuser
-        return request.user.is_superuser
-
-    def has_view_permission(self, request, obj=None):
-        if obj:
-            return obj.user == request.user or request.user.is_superuser
-        return request.user.is_superuser
-
 # ===============================
 # Pertanyaan Admin
 # ===============================
@@ -180,6 +153,45 @@ class PertanyaanAdmin(admin.ModelAdmin):
     def komunitas(self, obj):
         return obj.komunitas.nama
     komunitas.short_description = 'Komunitas'
+
+# ===============================
+# Galeri Admin
+# ===============================
+
+class GaleriAdmin(admin.ModelAdmin):
+    list_display = ('url_link', 'foto', 'user')
+    exclude = ('user',)
+    search_fields = ('url_link',)
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.user = request.user
+        super().save_model(request, obj, form, change)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(user=request.user)
+
+    def has_add_permission(self, request):
+        return request.user.is_authenticated
+
+    def has_change_permission(self, request, obj=None):
+        if obj:
+            return obj.user == request.user or request.user.is_superuser
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        if obj:
+            return obj.user == request.user or request.user.is_superuser
+        return True
+
+    def has_view_permission(self, request, obj=None):
+        if obj:
+            return obj.user == request.user or request.user.is_superuser
+        return True
+
 
 # ===============================
 # Register Semua Model
@@ -196,7 +208,7 @@ admin.site.register(Komunitas, KomunitasAdmin)
 admin.site.register(Balasan)
 admin.site.register(Konten, KontenAdmin)
 admin.site.register(Konfigurasi, KonfigurasiAdmin)
-admin.site.register(Galeri)
+admin.site.register(Galeri, GaleriAdmin)
 admin.site.register(Jawaban)
 
 admin.site.unregister(Group)

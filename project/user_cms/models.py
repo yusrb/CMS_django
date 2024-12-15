@@ -102,8 +102,20 @@ class Balasan(models.Model):
     class Meta:
         verbose_name = "Balasan"
         verbose_name_plural = "Balasan User"
-    
+
     reply_to = models.ForeignKey('self', null=True, blank=True, related_name='nested_replies', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Reply by {self.user.username} on {self.komen}"
+
+class Galeri(models.Model):
+    user = models.ForeignKey('admin_cms.User', on_delete=models.CASCADE, null=False)
+    url_link = models.CharField(max_length=60)
+    foto = models.ImageField(upload_to="galeri_foto/")
+
+    class Meta:
+        verbose_name = "Galeri"
+        verbose_name_plural = "Galeri"
+
+    def __str__(self):
+        return self.url_link

@@ -49,11 +49,11 @@
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-5">
-                <h5 class="mb-4 text-white text-uppercase font-weight-bold">Flickr Photos</h5>
+                <h5 class="mb-4 text-white text-uppercase font-weight-bold">Aspire Photos</h5>
                 <div class="row">
                     {% for galeri in galeris %}
                         <div class="col-4 mb-3">
-                            <a href=""><img class="w-100" src="{{ galeri.foto.url }}" alt=""></a>
+                            <a href="{{galeri.url_link}}" target="__blank"><img class="w-100" src="{{ galeri.foto.url }}" alt="{{galeri.user}}"></a>
                         </div>
                     {% endfor %}
                 </div>
